@@ -21,12 +21,17 @@ best <- function(state, outcome) {
     state.numeric = state.filter[,number]
     
     state.minimum=min(state.numeric,na.rm = FALSE)
-    
+
     state.a=state.filter[,number]
     
     state.row=state.filter[state.a==state.minimum,]
     
     state.best.hospital=state.row["Hospital.Name"]
+    
+    state.hospital.order=apply(state.best.hospital,2,order)
+    
+    state.best.hospital.order= state.best.hospital$Hospital.Name[state.hospital.order]
+
   }
-  return(state.best.hospital)
+  return(state.best.hospital.order[1])
 }
