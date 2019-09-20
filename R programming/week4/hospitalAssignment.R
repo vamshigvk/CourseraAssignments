@@ -16,15 +16,13 @@ best <- function(state, outcome) {
     
     state.filter = outcome.data[outcome.data$State==state,]
     
-    number=switch(outcome , "heart attack"=as.numeric(11),"heart failure"=17, "pneumonia"=22)
+    number=switch(outcome , "heart attack"=as.numeric(11),"heart failure"=as.numeric(17), "pneumonia"=as.numeric(23))
     
     state.numeric = state.filter[,number]
     
     state.minimum=min(state.numeric,na.rm = FALSE)
 
-    state.a=state.filter[,number]
-    
-    state.row=state.filter[state.a==state.minimum,]
+    state.row=state.filter[state.numeric==state.minimum,]
     
     state.best.hospital=state.row["Hospital.Name"]
     
