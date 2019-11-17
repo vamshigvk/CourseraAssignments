@@ -1,0 +1,103 @@
+---
+title: Public Health And Economic Problems Due to Storms And Other Severe Weather
+  Events
+author: "Vamshi Krishna"
+date: "11/17/2019"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+*Synopsis:* 
+  Storms and other severe weather events can cause both public health and economic problems for communities and municipalities. Many severe events can result in fatalities, injuries, and property damage, and preventing such outcomes to the extent possible is a key concern.This project involves exploring the U.S. National Oceanic and Atmospheric Administration's (NOAA) storm database. This database tracks characteristics of major storms and weather events in the United States, including when and where they occur, as well as estimates of any fatalities, injuries, and property damage.
+
+## Loading and preprocessing the data
+
+_Lets download the data and store it in "data" dataframe by using read.csv. Lets also download the support documents to find how some variables are constructed_
+
+```{r, cache=TRUE}
+dataURL = "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2"
+supportDocURL = "https://d396qusza40orc.cloudfront.net/repdata%2Fpeer2_doc%2Fpd01016005curr.pdf"
+FAQsURL = "https://d396qusza40orc.cloudfront.net/repdata%2Fpeer2_doc%2FNCDC%20Storm%20Events-FAQ%20Page.pdf"
+
+if(!file.exists("data.csv.bz2")) {
+  download.file(dataURL, destfile = "data.csv.bz2")
+  download.file(supportDocURL, destfile = "supportDoc.pdf", mode="wb")
+  download.file(FAQsURL, destfile = "FAQs.pdf", mode="wb")
+}
+  data=read.csv("data.csv.bz2")
+
+```
+
+*Lets analyze which types of events are most harmful with respect to population health?*
+
+_Lets calculate the total number of fatalities caused due to each type of event and see its structure_
+
+```{r}
+total_fatalities_wrt_evtype = with(data , tapply(FATALITIES, EVTYPE, sum))
+str(total_fatalities_wrt_evtype)
+```
+
+_Lets also calculate the total number of injuries caused due to each type of event and see its structure_
+```{r}
+total_injuries_wrt_evtype = with(data,tapply(INJURIES, EVTYPE, sum))
+str(total_injuries_wrt_evtype)
+```
+
+_Lets see the most 10 harmful types of events caused fatalities and injuries_
+
+```{r, fig.height=20, fig.width= 20}
+par(mfrow = c(2,1), mar = c(8,6,6,6))
+barplot(total_fatalities_wrt_evtype[tail(order(total_fatalities_wrt_evtype), n=10)],
+        xlab = "Event Type", ylab = "Fatalities" ,
+        main = "Events that are more harmful w.r.t Fatalities", las=2, cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5)
+
+barplot(total_injuries_wrt_evtype[tail(order(total_injuries_wrt_evtype), n=10)], 
+        xlab = "Event Type", ylab = "Injuries" ,
+        main = "Events that are more harmful w.r.t Injuries " , las=2, cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5)
+
+```
+
+*Results:*
+  We can see that the -TORNADO- event caused more number of fatalities and injuries, and the count of people effected by TORNADO is greater even if we sum up the top ten minus 1 events.
+  
+
+## Lets analyze which types of events have the greatest economic consequences
+
+_Lets analyze total loss of Properties which were damaged due to each type of event and see its structure_
+
+
+```{r}
+total_properties_wrt_evtype = with(data , tapply(PROPDMG, EVTYPE, sum))
+str(total_properties_wrt_evtype)
+```
+
+_Lets also calculate the total loss of Crops which were damaged due to each type of event and see its structure_
+```{r}
+total_crops_wrt_evtype = with(data,tapply(CROPDMG, EVTYPE, sum))
+str(total_crops_wrt_evtype)
+```
+
+_Lets see the most 10 harmful types of events caused damages to properties and crops_
+
+```{r, fig.height=10, fig.width= 20}
+par(mfrow = c(1,2), mar = c(8,6,4,4))
+barplot(total_properties_wrt_evtype[tail(order(total_properties_wrt_evtype), n=10)],
+        xlab = "Event Type", ylab = "Properties damaged" ,
+        main = "Events that are more harmful w.r.t Properties damaged", las=2, cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,mgp=c(6,1,0))
+
+barplot(total_crops_wrt_evtype[tail(order(total_crops_wrt_evtype), n=10)], 
+        xlab = "Event Type", ylab = "Crops damaged" ,
+        main = "Events that are more harmful w.r.t Crops damaged " , las=2, cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,mgp=c(6,1,0))
+
+```
+
+*Results:*
+  We could see that most of the crops were damaged due to HAIL and most of the properties were damaged due to TORNADO.
+
+*Summary:*
+  It is observed from the analysis that more fatalities, injuries and Property damages were caused due to TORNADO and more Crop damages were due to HAIL. So, Government should take care of humans when there is a sight of occurance of TORNADO and provide treatment to the injured people.
+
+
+
+
