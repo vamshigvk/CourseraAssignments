@@ -1,0 +1,144 @@
+---
+title: "Statistical Inference Part1"
+author: "Vamshi Krishna"
+date: "12/9/2019"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+*Synopsis:* 
+
+    In this project I am going to investigate the exponential distribution in R and compare it with Central Limit Theorem(CLT).The exponential distribution can be simulated in R with rexp(n, lambda) where lambda is the rate parameter. The mean of exponential distribution is 1/lambda and the standard deviation is also 1/lambda. Using lambda = 0.2 for all of the simulations and investigate the distribution of averages of 40 exponentials and do a 1000 simultaions like this.
+  
+## Instructions:
+
+  1.Show the sample mean and compare it to the theoretical mean of the distribution.
+  2.Show how variable the sample is (via variance) and compare it to the theoretical variance of the distribution.
+  3.Show that the distribution is approximately normal.
+
+### Preparing simulation data
+
+Setting variables as defined in the problem and calculating means of 1000 simulations by running a for loop from 1 to 1000 and storing each time a mean value of rexp with n and lambda in in meanData variable.
+
+```{r}
+set.seed(123)    #for reproducibility
+n=40              #sample size
+lambda=0.2        #given lambda for rexp
+meanData=NULL        
+for(i in 1:1000) meanData = c(meanData, mean(rexp(n,lambda)))
+```
+
+## 1. Comparing Sample Mean and Theoretical Mean
+
+
+### Sample Mean:
+
+Lets calculate the mean of meanData to get the sample mean of simulation data
+
+```{r}
+sampleMean = mean(meanData)
+sampleMean
+```
+
+### Theoretical Mean:
+
+Lets also calculate the theoretical mean. as we discussed earlier in the synopsis mean is the 1 over lambda,
+
+```{r}
+theoreticalMean=1/lambda
+theoreticalMean
+```
+
+The distribution of mean of the sample mean is centered at `r sampleMean` and theoretical mean is centered at `r theoreticalMean`. Both the means are very close.
+
+### Lets see the Sample Mean versus Theoretical Mean through a histogram:
+
+```{r}
+hist(meanData, xlab = "Mean" , ylab = "Frequency", main = "Simulation of Exponential Distribution")
+abline(v=theoreticalMean, col = "red", lw=2)
+abline(v=sampleMean, col = "blue", lw=2)
+```
+
+
+## 2. Comparing Sample Variance and Theoretical Variance
+
+### Sample Standard deviation:
+
+Lets calculate the sample standard deviation in order to calculate the sample variance
+
+```{r}
+sampleSD = sd(meanData)
+sampleSD
+```
+
+### Sample Variance:
+
+and we get sample variance from sample standard deviation by squaring it or we can use var() function
+
+```{r}
+sampleVariance = var(meanData)
+sampleVariance
+```
+
+### Theoretical Standard deviation:
+
+Lets also calculate the theoretical standard deviation which is 1 over lambda
+
+```{r}
+theoreticalSD = 1/(lambda*sqrt(n))
+theoreticalSD
+```
+
+### Theoretical Variance:
+
+and we get theoretical variance from theoretical standard deviation by squaring it
+
+```{r}
+theoreticalVariance = 1/(lambda^2 * n)
+theoreticalVariance
+```
+
+we can see both sample standard deviation `r sampleSD` and `r theoreticalSD` are almost close and 
+we can also see both sample variance `r sampleVariance` and `r theoreticalVariance` are also close.
+
+## 3. Distribution is approximately normal:
+
+```{r}
+hist(meanData, breaks = n, prob = T,  xlab = "Means" , ylab = "Density" , main = "Density curve of meanData")
+xPlot <- seq(min(meanData), max(meanData), length=40)
+yPlot <- dnorm(xPlot, mean=1/lambda, sd=((1/lambda)/sqrt(n)))
+lines(xPlot, yPlot, col="black", lty=2, lwd=2)
+```
+
+### Lets plot a complete density plot
+```{r}
+d=density(meanData)
+plot(d, xlab = "mean" , ylab ="density", main = "Density plot of 1000 Exponential simulations")
+polygon(d, col = "red" , border = "blue")
+```
+
+The above figures shows the distribution of sample means, it is approximately normal. The black density curve corresponds to N(`r theoreticalMean `,`r theoreticalVariance`)
+
+## 4. Confidence Interval Comparison:
+
+Lets calculate both sample and theoretical Confidence Intervals:
+
+```{r}
+theoreticalCI = theoreticalMean + c(-1,1)*qnorm(0.975)*theoreticalSD/sqrt(n)
+round(theoreticalCI,3)
+```
+
+```{r}
+sampleCI = sampleMean + c(-1,1)*qnorm(0.975)*sampleSD/sqrt(n)
+round(sampleCI)
+```
+
+The sample confidence interval `r sampleCI` and theoretical confidence interval `r theoreticalCI` which are also close. Hence the distribution is proved to be approximately Normal.
+
+## Conclusion:
+
+It is determined thst the distribution does indeed demonstrate the Central Limit Theorem, a bell curve.
+After graphing all the values and comparing means, variance and confidence intervals it is proved that the Exponential distribution is approximately Normal.
+
