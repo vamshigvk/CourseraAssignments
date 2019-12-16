@@ -1,0 +1,119 @@
+---
+title: "Statistical Inference Part2"
+author: "Vamshi Krishna"
+date: "12/11/2019"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+*Synopsis: * 
+  Now in the second portion of the project, we're going to analyze the ToothGrowth data in the R datasets package.The response in the length of tooth when they receive one of the 2 suppelements namely OJ (Orange Juice) and VC (Vitamin C) and one of the 3 doses (0.5, 1, 2) on total 60 animals.
+  
+## Instructions:
+  1. Load the ToothGrowth data and perform some basic exploratory data analyses
+  2. Provide a basic summary of the data.
+  3. Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. (Only use the     techniques from class, even if there's other approaches worth considering)
+  4. State your conclusions and the assumptions needed for your conclusions.
+  
+## 1. Loading necessary packages and data, summarizing the ToothGrowth data
+```{r}
+library(ggplot2)
+
+library(datasets)
+data("ToothGrowth")
+str(ToothGrowth)
+```
+There are two types of supplements and 3 types of doses.
+
+Lets check for the null values present in the data
+```{r}
+table(is.na(ToothGrowth$len))
+```
+There are no null values in the length column
+
+### Lets calculate the mean of each supplements
+
+```{r}
+vc = subset(ToothGrowth, supp %in% "VC")
+vc_mean =mean(vc$len)
+```
+Mean of VC is `r vc_mean`
+
+```{r}
+oj = subset(ToothGrowth, supp %in% "OJ")
+oj_mean = mean(oj$len)
+```
+Mean of OJ is `r oj_mean`. oj_mean is greater than vc_mean.
+
+### Lets draw a boxplot to show each supplement
+
+```{r}
+g1 = ggplot(data=ToothGrowth, mapping = aes(supp,len)) + geom_boxplot(aes(fill = supp)) + xlab("Supp Type") + ylab("Length of Tooth grown") + ggtitle("Supplement type vs Tooth Length")
+print(g1)
+```
+
+This graph shows the growth of tooth depending on the given supplement to subject. we can conclude that the overall growth is higher with OJ when compared to VC.
+
+Lets plot one more plot to show the difference in growth of the tooth with respect to dose:
+
+```{r}
+g2 = ggplot(data = ToothGrowth, aes(supp,len)) + geom_boxplot(aes(fill = dose)) + xlab("Supplement with dose level") + ylab("Length of tooth") + facet_grid(~dose) + ggtitle("Supplement level vs Tooth length")
+print(g2)
+```
+
+From the above plot we can conclude that mean growth of tooth length is high with supplement OJ and dose 0.5 and 1 but in case of 2 as dose level the mean growth is high with supplement VC with a little difference.
+
+## 2. Lets see the basic summary of data:
+
+Lets see how the data is with the help of head function
+```{r}
+head(ToothGrowth)
+```
+There are 3 columns and length depends on the supplement and dosage level.
+
+Lets also see the summary of the dataframe
+```{r}
+summary(ToothGrowth)
+```
+
+## 3. Lets use t.test to find confidence level and p value to compare tooth growth 
+
+Lets do a normal t-test initially for VC and OJ lengths irrespective of dose:
+
+```{r}
+t.test(vc$len,oj$len,paired = FALSE)
+```
+
+Since the p-value is near to 0.05 and confidence interval contains 0 in it and mean length is greater when supplement is OJ overally. We can say that supplement types seems to have no impact on Tooth growth based on this test.
+
+So, lets do t-test with respect to dosage level:
+
+```{r}
+t.test(len~supp, data = ToothGrowth[ToothGrowth$dose==0.5,], paired = FALSE)
+```
+
+```{r}
+t.test(len~supp, data = ToothGrowth[ToothGrowth$dose==1,], paired = FALSE)
+```
+
+```{r}
+t.test(len~supp, data = ToothGrowth[ToothGrowth$dose==2,], paired = FALSE)
+```
+
+## 4. Conclusions and the assumptions needed for your conclusions.:
+
+Assumption: The t-test performed above assumed that the sample data was unpaired
+
+Conclusion from the exploratory data analysis indicate OJ increase tooth length more effective than VC. Since, mean length of OJ is `r oj_mean` and mean length of VC is `r vc_mean`.
+
+Conclusion from the t-test tells how dosage level impacted the growth in tooth length:
+
+  1. Oj(mean = 13.23) has more impact in growth of teeth compared to VC(mean=7.98) when dosage level is 0.5
+  2. OJ(mean=22.7) has more impact in growth of teeth compared to VC(mean=16.77) when dosage level is 1
+  3. But in case of dosage level=2 it is slightly different , VC mean = 26.06 and OJ mean = 26.14. Here VC has little bit higher mean than OJ.
+  4. Overally, we can say that the increase in dosage level gives more increase in length of the tooth.
+
+
+
