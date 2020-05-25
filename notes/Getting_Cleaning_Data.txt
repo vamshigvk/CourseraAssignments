@@ -1,0 +1,625 @@
+GETTING AND CLEANING DATA
+______________________________________________________________________________________
+
+https://data.baltimorecity.gov/
+
+data.gov.in
+
+open data websites
+
+______________________________________________________________________________________
+
+Goal of getting and cleaning data course
+
+Raw data -> processsing the script -> tidy data - > data analysis -> data communication
+
+______________________________________________________________________________________
+
+data are values of qualitative or quantitative variables, belonging to a set of items(population or something you are interested in).
+
+file.exists() to check if the file/folder already exists, dir.create() is usesd to create one if doesn't exist. download.file() to download file from url
+ 
+read.table() is used to load table/data into ram,it looks for tab separated values, read.csv() loooks for comma separated values
+______________________________________________________________________________________
+
+xmlTreeParse(fileUrl, useInternal=TRUE) used to load doc into ram,useInternal=TRUE is used to get all different nodes inside of that .
+xmlRoot() gives root node , xmlName(rootNode) gives its name
+rootNode[[1]] gives first food component, rootNode[[1]][1] gives first subcomponent of first component
+xmlSApply(rootNode,xmlXalue) gives all values in xml which means extracts parts of the file
+______________________________________________________________________________________
+
+/node - top level node
+//node - node at any level or all nodes 
+node[@attr-name] - node with an attribute name , node[@attr-name='bob']
+ 
+ xpathSApply(rootNode,"//name",xmlValue) gives all names values 
+______________________________________________________________________________________
+fromJson("https://api.github.com/users/jtleek/repos") is used to load json data into ram.
+toJson(iris,pretty=TRUE) to create a json from another type
+______________________________________________________________________________________
+user: gvk , password: vamshigvk for local mysql connection 
+MYSQL connecting online;
+conn=dbConnect(MySQL() , user="genome" , db="hg19" host="genome-mysql.soe.ucsc.edu") for connection with hg19 database
+result=dbGetQuery(conn,"show databases;") ; dbDisconnect(conn) for running a query and disconnecting
+dbListTables(conn) gives list of tables in the database hg19. dbListFields(hg19,"affyU133Plus2") gives fileds in that table.
+dbGetQuery(conn, "select count(*) from affyU133Plus2") gives number of records inthe table ; dbReadTable(conn,"TableName") to read table as dataframe
+query=dbSendQuery(conn,"select * from affyU133Plus2 where misMatches between 1 and 3") runs query and doesn't fetch values locally. to use some of values locally from this query use result=fetch(query,n=10)  and run dbClearResult(query) to clear query remotely.
+______________________________________________________________________________________
+created=h5createFile("example.h5") to create HDF5 file set. for this install rhdf5 package from biocLite  of bioConductor
+created=h5createGroup("example.h5","foo") to create group. h5ls("example.h5") to display all groups
+h5Write(matrix,"example.h5","foo") used to write matrix into particular group of h5
+h5Read("example.h5","group") to read data in a group. 
+______________________________________________________________________________________
+webscraping
+
+parsing with html:
+conn=url("https://scholar.google.com/citations?user=HI-I6C0AAAAJ&hl=en") makes connection to that page
+htmlCode=readLines(conn) to read html code from url, and close(conn) to close the connection you made.
+
+parsing with xml:
+url=http://scholar.google.com/citations?user=HI-I6C0AAAAJ&hl=en
+xml=htmlTreeParse(url,useInternalNodes=T)
+xpathSApply(xml , "//td[@id='col-citedby']" , xmlValue)
+
+another way:
+library(httr) ; html2=GET(url)
+content2=content(html2,as="text")
+parsedHtml=htmlParse(content2, asText = TRUE)
+xpathSApply(parsedHtml,"//title",xmlValue)
+html2=GET(url,authenticate("user","password")) if any pgae asks for login
+
+use handles to save your authentication across websites.
+google=handle("http://google.com")
+get=GET(handle=google,path="/")
+get1=GET(handle=google,path="search")
+
+______________________________________________________________________________________
+
+gdp=data.table::fread("./data/gdp.csv", skip=10 , nrows = 190 , select = c(1,2,4,5) , col.names =  c("Country","Ranking","Economy","Total")) 
+______________________________________________________________________________________
+
+melting dataframes:
+mtcars$carname=rownames(mtcars) 
+carmelt=melt(mtcars,id=c("carname","gear","cyl") , measure.vars = c("mpg","hp")) gives 2 different rows for each car 1 with mpg,value and other with hp,value  in variable and value column names respectively. used to melt table into different columns to single columns etc
+
+cyldata=dcast(carmelt,cyl ~ variable)  gives a table with carmelt as data and cyl data as rowname and variable as number of times each variable values present/repeated .  similar to factoring 
+cyldata=dcast(carmelt,cyl ~ variable , mean) calculates its mean and displays in table instead of its count
+______________________________________________________________________________________
+
+averaging values:
+
+tapply(InsectSprays$count, InsectSprays$spray, sum)
+			
+				or
+
+spIns=split(InsectSprays$count,InsectSprays$spray) and lapply(spIns, sum) gives same above result
+
+				or
+				
+ddply(InsectSprays, .(spray),summarise,sum=sum(count))   :    .(spray) is similar to "spray"
+
+also see acast() , arrange() , mutate()
+______________________________________________________________________________________
+
+dplyr verbs : select , filter, mutate, rename , arrange, summarise/summarize
+
+chicago is a dataset and 
+a=mutate(chicago,month=as.POSIXlt(date)$mon+1)  and 
+b=group_by(a,month) 
+instead of writing chicago each time you can use pipeline %>% . EX:
+chicago %>% mutate(month,as.POSIXlt(date)$mon+1) %>% group_by(month) is simple because no need to give data everytime
+
+summarize_all(data,funs(mean)) is used to summarize all columns with mean.
+
+pack_sum <- summarize(by_package, count = n(), unique = n_distinct(ip_id), countries = n_distinct(country), avg_bytes = mean(size))
+
+______________________________________________________________________________________
+
+Editing text variables :
+
+tolower(names(mtcars)) lowers the text  and toupper() capitals the text 
+
+splitNames=strSplit(names(cameraData),"\\.") is used to split a variable into 2 if it consists a dot in its name. EX: location.1 gives "location" and "1" as 2 different variables
+now you can use first variable as a column name with splitNames[[6]][] 
+ 
+splitNames=strSplit(names(cameraData),"\\.")
+firstName=function(x){x[1]}
+sapply(splitNames, firstName)
+use these 3 lines to convert all the names into non dotted names
+ 
+sub("old","new",names(csv)) is used for replacement of first match. similar to replace() function in java
+gsub() is used for replacement of all matches. similar to replaceAll() function in java
+
+grep("Alameda",cameraData$intersection) gives the indices where all it appears in column of intersection
+grep("Alameda",cameraData$intersection,value=TRUE) gives the complete values of cell also 
+grepl("Alameda",cameraData$intersection) gives a TRUE or FALSE vector.
+
+______________________________________________________________________________________
+
+library(stringr)
+nchar("vamshi") gives 6 , 
+substr("vamshi",1,5) gives vamsh
+paste("vamshi","krishna") gives "vamshi krishna"  and paste("vamshi","krishna",sep="") gives "vamshikrishna" 
+paste0("vamshi","krishna") gives "vamshikrishna" is similar to paste with separator as no space
+str_trim("vamshi   ") gives "vamshi" which is used to remove whitespaces
+______________________________________________________________________________________
+
+good practice of column names are:
+Names should be in lowercase, descriptive , no duplicates , no special characters like "." "_" " "
+variables with charater values should usually be made into factors variables.
+variable should be descriptive like TRUE or FALSE and not T/F , MALE /FEMALE instead M/F
+______________________________________________________________________________________
+
+Regular expressions:
+(^) : ^i think : which means "i think" literal should be in start of line ,only then it matches
+($) : morning$ : which similarly represents that literal should be at the end of line
+[Bb][Uu][Ss][Hh] or ^[Ii]am or ^[0-9][a-zA-Z] matches with bush , Bush , buSH : iam , Iam , 0a, 7B
+[^?.]$ means it matches if it does not end with '.' and '?'
+? : indicates the literal is optional
+[G]o(o)?[d] matches with good and god
+
+(.) indicates a character and (9.11) matches with 9a11 or 9_11 
+(\.) matches with dot "." and it is not a metacharacter because it is having forward slash attached with it
+
+* indicates 0 or more and (.*) indicates 0 or more characters 
++ indicates 1 or more
+m,n is atleast m times and atmost n times. good[1,3] matches with good , good good good or good good
+m is exactly m times
+m,   is atleast m times
+
+"|" acts like or / alternative , flood|fire means either it matches with flood or fire
+^[Gg]ood|[Bb]ad : Good at beginning or bad in middle
+^([Gg]ood|[Bb]ad) : good and bad at the beginning
+
+\1 means repeat atleast once : EX. +([a-zA-Z]+) +\1+ matches with blah blah or night night 
+^s(.*)s matches with start and end with s. or ^s(.*?)s$
+______________________________________________________________________________________
+working with Dates:
+
+d1=date()  gives date and time  "Sat Sep 28 16:58:17 2019"cand its class if of type character
+d2=Sys.Date() gives only date "2019-09-28" and its class is of type date
+format(d2,"%a,%b,%d") gives  "Sat,Sep,28" is used to format date with 
+
+x=c("16Jan2018","17Jan2018","18Jan2018")
+d3=as.Date(x,"%d%b%Y") gives date class as "2018-01-16" "2018-01-17" "2018-01-18"
+d3[3]-d3[1] gives Time difference of 2 days
+as.numeric(d3[3]-d3[1]) gives 2
+
+below is used to convert char to time 
+time<-c("00:00:01", "01:02:00", "09:30:01", "14:15:25")
+library(chron) gives is.weekend() function
+x <- chron(times=time) 
+
+weekdays(d2) gives "Saturday"
+wday(d2) gives 7 and wday(d2,label = TRUE) gives Sat with Levels: Sun < Mon < Tue < Wed < Thu < Fri < Sat
+months(d2) gives "September"
+julian(d2) gives  18167, which means it's been 18167 days from attr(,"origin")  "1970-01-01"
+
+library(lubridate)
+this_moment <- now() gives todays date and time 
+this_day <- today() gives today's date
+
+ymd("19960329") gives "1996-03-29"
+mdy("03291996") gives "1996-03-29"
+dmy("29031996") gives "1996-03-29" are same as dmy("29/03/1996") gives "1996-03-29" and  dmy("29.03.1996") gives "1996-03-29"
+
+ymd_hms("1996-03-29 10:15:03") gives "1996-03-29 10:15:03 UTC"
+ymd_hms("1996-03-29 10:15:03",tz="Pacific/Auckland") gives with timezone "1996-03-29 10:15:03 NZST"
+
+The update() function allows us to update one or more components of a date-time.
+update(this_moment, hours = 8, minutes = 34, seconds = 55) gives  "2019-10-04 08:34:55 IST"
+
+Q:| Now, pretend you are in New York City and you are planning to visit a friend in Hong Kong. You seem to have misplaced
+| your itinerary, but you know that your flight departs New York at 17:34 (5:34pm) the day after tomorrow. You also know
+| that your flight is scheduled to arrive in Hong Kong exactly 15 hours and 50 minutes after departure.
+
+nyc <- now("America/New_York")
+depart <- nyc + days(2)
+depart <- update(depart, hours=17, minutes= 34)
+arrive <- depart + hours(15) + minutes(50)
+arrive <- with_tz(arrive, tzone = "Asia/Hong_Kong")
+last_time <- mdy("June 17, 2008", tz="Singapore")
+how_long <- interval(last_time, arrive)
+as.period(how_long)
+
+______________________________________________________________________________________
+data_resources:
+
+data.baltimore.gov  of baltimore
+data.un.org of united nation
+data.gov.uk of united kingdom
+data.gov.in of india
+data.gov.fr of france
+data.gov.gh of ghana
+data.gov.au of australia
+data.gov.de of germany
+gov.hk.en/theme/psi/datasets/ of hongkong
+data.go.jp of japan
+data.gov/opendatasites
+
+www.gapminder.org
+www.asdfree.com
+www.infochimps.com/marketplace
+www.kaggle.com
+
+collection by data scientists:
+
+Hilary mason
+Peter  Skomoroch
+Jeff Hammerbacher
+Gregory Piatetsky-Shapiro
+
+more specialized collections:
+
+Stanford large Network data
+UCI Machine Learning
+KDD Nugets Datasets
+CMU statlib
+Gene expression omnibus
+ArXiv Data
+Pubic datasets on aws
+
+Some api's with R package:
+
+twitter and twitterR package
+figshare and Rfigshare
+PLoS and rplos
+rOpenSci
+Facebook and RFacebook
+Google Maps and RGoogleMaps
+
+______________________________________________________________________________________
+
+
+> cran
+# A tibble: 225,468 x 11
+       X date       time        size r_version r_arch r_os      package      version country ip_id
+   <int> <chr>      <chr>      <int> <chr>     <chr>  <chr>     <chr>        <chr>   <chr>   <int>
+ 1     1 2014-07-08 00:54:41   80589 3.1.0     x86_64 mingw32   htmltools    0.2.4   US          1
+ 2     2 2014-07-08 00:59:53  321767 3.1.0     x86_64 mingw32   tseries      0.10-32 US          2
+ 3     3 2014-07-08 00:47:13  748063 3.1.0     x86_64 linux-gnu party        1.0-15  US          3
+ 4     4 2014-07-08 00:48:05  606104 3.1.0     x86_64 linux-gnu Hmisc        3.14-4  US          3
+ 5     5 2014-07-08 00:46:50   79825 3.0.2     x86_64 linux-gnu digest       0.6.4   CA          4
+ 6     6 2014-07-08 00:48:04   77681 3.1.0     x86_64 linux-gnu randomForest 4.6-7   US          3
+ 7     7 2014-07-08 00:48:35  393754 3.1.0     x86_64 linux-gnu plyr         1.8.1   US          3
+ 8     8 2014-07-08 00:47:30   28216 3.0.2     x86_64 linux-gnu whisker      0.3-2   US          5
+ 9     9 2014-07-08 00:54:58    5928 NA        NA     NA        Rcpp         0.10.4  CN          6
+10    10 2014-07-08 00:15:35 2206029 3.0.2     x86_64 linux-gnu hflights     0.1     US          7
+# ... with 225,458 more rows
+
+cran %>%
+  select(ip_id, country, package, size) %>%
+  mutate(size_mb = size / 2^20) %>%
+  filter(size_mb <= 0.5) %>%
+  arrange(desc(size_mb))
+ 
+______________________________________________________________________________________
+
+library(tidyr)
+
+Properties of a tidydata
+| 1) Each variable forms a column
+| 
+| 2) Each observation forms a row
+| 
+| 3) Each type of observational unit forms a table
+
+> students
+  grade male female
+1     A    5      3
+2     B    4      1
+3     C    8      6
+4     D    4      5
+5     E    5      5
+> gather(students, sex, count, -grade)
+  
+  grade    sex count
+1      A   male     5
+2      B   male     4
+3      C   male     8
+4      D   male     4
+5      E   male     5
+6      A female     3
+7      B female     1
+8      C female     6
+9      D female     5
+10     E female     5
+| It's important to understand what each argument to gather() means. The data argument, students, gives the name of the
+| original dataset. The key and value arguments -- sex and count, respectively -- give the column names for our tidy
+| dataset. The final argument, -grade, says that we want to gather all columns EXCEPT the grade column (since grade is
+| already a proper column variable.)
+______________________________________________________________________________________
+
+> students2
+  grade male_1 female_1 male_2 female_2
+1     A      7        0      5        8
+2     B      4        0      5        8
+3     C      7        4      5        6
+4     D      8        2      8        1
+5     E      8        4      1        0
+
+students2 %>%
+  gather( sex_class, count , -grade ) %>%
+  separate( sex_class , c("sex", "class")) %>%
+  print
+
+   grade    sex class count
+1      A   male     1     7
+2      B   male     1     4
+3      C   male     1     7
+4      D   male     1     8
+5      E   male     1     8
+6      A female     1     0
+7      B female     1     0
+8      C female     1     4
+9      D female     1     2
+10     E female     1     4
+11     A   male     2     5
+12     B   male     2     5
+13     C   male     2     5
+14     D   male     2     8
+15     E   male     2     1
+16     A female     2     8
+17     B female     2     8
+18     C female     2     6
+19     D female     2     1
+20     E female     2     0
+
+______________________________________________________________________________________
+
+> students3
+    name    test class1 class2 class3 class4 class5
+1  Sally midterm      A   <NA>      B   <NA>   <NA>
+2  Sally   final      C   <NA>      C   <NA>   <NA>
+3   Jeff midterm   <NA>      D   <NA>      A   <NA>
+4   Jeff   final   <NA>      E   <NA>      C   <NA>
+5  Roger midterm   <NA>      C   <NA>   <NA>      B
+6  Roger   final   <NA>      A   <NA>   <NA>      A
+7  Karen midterm   <NA>   <NA>      C      A   <NA>
+8  Karen   final   <NA>   <NA>      C      A   <NA>
+9  Brian midterm      B   <NA>   <NA>   <NA>      A
+10 Brian   final      B   <NA>   <NA>   <NA>      C
+
+students3 %>%
+  gather( class, grade , 3  : 7 , na.rm = TRUE) %>%   #here 3:7 gathers column3 to column7 and assigns them to class key and grade as value.
+  print
+  
+    name    test  class grade
+1  Sally midterm class1     A
+2  Sally   final class1     C
+9  Brian midterm class1     B
+10 Brian   final class1     B
+13  Jeff midterm class2     D
+14  Jeff   final class2     E
+15 Roger midterm class2     C
+16 Roger   final class2     A
+21 Sally midterm class3     B
+22 Sally   final class3     C
+27 Karen midterm class3     C
+28 Karen   final class3     C
+33  Jeff midterm class4     A
+34  Jeff   final class4     C
+37 Karen midterm class4     A
+38 Karen   final class4     A
+45 Roger midterm class5     B
+46 Roger   final class5     A
+49 Brian midterm class5     A
+50 Brian   final class5     C
+ 
+and 
+ 
+students3 %>%
+  gather(class, grade, class1:class5, na.rm = TRUE) %>%
+  spread(test , grade ) %>%                                  #spread is used to spread a column into 2 columns with key as column to spread and value as its value
+  print
+
+    name  class final midterm
+1  Brian class1     B       B
+2  Brian class5     C       A
+3   Jeff class2     E       D
+4   Jeff class4     C       A
+5  Karen class3     C       C
+6  Karen class4     A       A
+7  Roger class2     A       C
+8  Roger class5     A       B
+9  Sally class1     C       A
+10 Sally class3     C       B
+
+library(readr)
+
+students3 %>%
+  gather(class, grade, class1:class5, na.rm = TRUE) %>%
+  spread(test, grade) %>%
+  mutate(class= parse_number(class)) %>%              #parse_number is used to remain only number in given value or column
+  print
+
+    name class final midterm
+1  Brian     1     B       B
+2  Brian     5     C       A
+3   Jeff     2     E       D
+4   Jeff     4     C       A
+5  Karen     3     C       C
+6  Karen     4     A       A
+7  Roger     2     A       C
+8  Roger     5     A       B
+9  Sally     1     C       A
+10 Sally     3     C       B
+
+> students4
+    id  name sex class midterm final
+1  168 Brian   F     1       B     B
+2  168 Brian   F     5       A     C
+3  588 Sally   M     1       A     C
+4  588 Sally   M     3       B     C
+5  710  Jeff   M     2       D     E
+6  710  Jeff   M     4       A     C
+7  731 Roger   F     2       C     A
+8  731 Roger   F     5       B     A
+9  908 Karen   M     3       C     C
+10 908 Karen   M     4       A     A
+
+student_info <- students4 %>%
+  select(id, name, sex) %>%
+  unique %>%
+  print
+
+   id  name sex
+1 168 Brian   F
+3 588 Sally   M
+5 710  Jeff   M
+7 731 Roger   F
+9 908 Karen   M
+
+gradebook <- students4 %>%
+  select(id,class,midterm,final) %>%
+  print
+  
+    id class midterm final
+1  168     1       B     B
+2  168     5       A     C
+3  588     1       A     C
+4  588     3       B     C
+5  710     2       D     E
+6  710     4       A     C
+7  731     2       C     A
+8  731     5       B     A
+9  908     3       C     C
+10 908     4       A     A
+
+
+> failed
+   name class final
+1 Brian     5     C
+2 Sally     1     C
+3 Sally     3     C
+4  Jeff     2     E
+5  Jeff     4     C
+6 Karen     3     C
+
+> passed
+   name class final
+1 Brian     1     B
+2 Roger     2     A
+3 Roger     5     A
+4 Karen     4     A
+
+> passed <- passed %>% mutate(status = "passed")
+
+> passed
+   name class final status
+1 Brian     1     B passed
+2 Roger     2     A passed
+3 Roger     5     A passed
+4 Karen     4     A passed
+
+> failed <- failed %>% mutate(status = "failed")
+
+   name class final status
+1 Brian     5     C failed
+2 Sally     1     C failed
+3 Sally     3     C failed
+4  Jeff     2     E failed
+5  Jeff     4     C failed
+6 Karen     3     C failed
+
+> bind_rows(passed,failed)
+
+    name class final status
+1  Brian     1     B passed
+2  Roger     2     A passed
+3  Roger     5     A passed
+4  Karen     4     A passed
+5  Brian     5     C failed
+6  Sally     1     C failed
+7  Sally     3     C failed
+8   Jeff     2     E failed
+9   Jeff     4     C failed
+10 Karen     3     C failed
+
+
+***each row is an observation, each column is a variable, and the table contains a single observational unit. Thus, the data are tidy
+______________________________________________________________________________________
+
+> sat
+# A tibble: 6 x 10
+  score_range read_male read_fem read_total math_male math_fem math_total write_male write_fem write_total
+  <chr>           <int>    <int>      <int>     <int>    <int>      <int>      <int>     <int>       <int>
+1 700-800         40151    38898      79049     74461    46040     120501      31574     39101       70675
+2 600-690        121950   126084     248034    162564   133954     296518     100963    125368      226331
+3 500-590        227141   259553     486694    233141   257678     490819     202326    247239      449565
+4 400-490        242554   296793     539347    204670   288696     493366     262623    302933      565556
+5 300-390        113568   133473     247041     82468   131025     213493     146106    144381      290487
+6 200-290         30728    29154      59882     18788    26562      45350      32500     24933       57433
+
+sat %>%
+  select(-contains("total")) %>%
+  gather(part_sex,count, -score_range) %>%
+  separate(part_sex, into = c("part","sex")) %>%
+  print
+  
+   score_range part  sex    count
+   <chr>       <chr> <chr>  <int>
+ 1 700-800     read  male   40151
+ 2 600-690     read  male  121950
+ 3 500-590     read  male  227141
+ 4 400-490     read  male  242554
+ 5 300-390     read  male  113568
+ 6 200-290     read  male   30728
+ 7 700-800     read  fem    38898
+ 8 600-690     read  fem   126084
+ 9 500-590     read  fem   259553
+10 400-490     read  fem   296793
+# ... with 26 more rows
+
+sat %>%
+  select(-contains("total")) %>%
+  gather(part_sex, count, -score_range) %>%
+  separate(part_sex, c("part", "sex")) %>%
+   group_by(part , sex) %>%
+  mutate(total=sum(count),prop=count/total) %>% print
+
+   <chr>       <chr> <chr>  <int>  <int>  <dbl>
+ 1 700-800     read  male   40151 776092 0.0517
+ 2 600-690     read  male  121950 776092 0.157 
+ 3 500-590     read  male  227141 776092 0.293 
+ 4 400-490     read  male  242554 776092 0.313 
+ 5 300-390     read  male  113568 776092 0.146 
+ 6 200-290     read  male   30728 776092 0.0396
+ 7 700-800     read  fem    38898 883955 0.0440
+ 8 600-690     read  fem   126084 883955 0.143 
+ 9 500-590     read  fem   259553 883955 0.294 
+10 400-490     read  fem   296793 883955 0.336 
+# ... with 26 more rows
+
+______________________________________________________________________________________
+
+regex patterns:
+
+Character classes
+.	any character except newline
+\w\d\s	word, digit, whitespace
+\W\D\S	not word, digit, whitespace
+[abc]	any of a, b, or c
+[^abc]	not a, b, or c
+[a-g]	character between a & g
+Anchors
+^abc$	start / end of the string
+\b\B	word, not-word boundary
+Escaped characters
+\.\*\\	escaped special characters
+\t\n\r	tab, linefeed, carriage return
+Groups & Lookaround
+(abc)	capture group
+\1	backreference to group #1
+(?:abc)	non-capturing group
+(?=abc)	positive lookahead
+(?!abc)	negative lookahead
+Quantifiers & Alternation
+a*a+a?	0 or more, 1 or more, 0 or 1
+a{5}a{2,}	exactly five, two or more
+a{1,3}	between one & three
+a+?a{2,}?	match as few as possible
+ab|cd	match ab or cd
+
+______________________________________________________________________________________
+

@@ -1,0 +1,253 @@
+R CMD BATCH /home/demo/learnR/Rprogramming.R   - to run batch files ,The output of this command will be stored in a file called Rprogramming.Rout
+
+What is a database?
+A database is an organized collection of structured information, or data, typically stored electronically in a computer system.
+ A database is usually controlled by a database management system (DBMS).
+ Together, the data and the DBMS, along with the applications that are associated with them, are referred to as a database system,
+ often shortened to just database.
+ for more info about database visit https://www.oracle.com/in/database/what-is-database.html
+ 
+ 
+what is a schema?
+http://www.informit.com/articles/article.aspx?p=1216889&seqNum=2
+
+
+
+Rscript /home/demo/learnR/Rprogramming.R - prints output to console instead of file
+
+If you want to turn your R program into an executable , add this to first line of your code . #!/usr/bin/env Rscript    and execute it from the terminal as ./Rprogramming.R
+
+help(reserved) or ?reserved   to take help from R 
+	
+a.variable.name is preferred over a_variable_name or alternatively we could use camel case as aVariableName
+
+Zero is considered FALSE and non-zero numbers are taken as TRUE. An example run.
+
+When there is a mismatch in length (number of elements) of operand vectors, the elements in shorter one is recycled in a cyclic manner to match the length of the longer one.
+
+R will issue a warning if the length of the longer vector is not an integral multiple of the shorter vector.
+
+But && and || examines only the first element of the operands resulting into a single length logical vector. ex: c(TRUE,FALSE,0,5) && c(FALSE,TRUE,5,0) gives FALSE as output
+
+<-, <<-, = are used for Leftwards assignment, ->, ->>	Rightwards assignment
+
+my.name <- readline(prompt="Enter name: ") used to Take input from user
+
+we convert the input age, which is a character vector into integer using the function as.integer().
+
+paste converts its arguments (via as.character ) to character strings, and concatenates them (separating them by the string given by sep ).
+
+> seq(1, 3, by=0.2)          # specify step size
+[1] 1.0 1.2 1.4 1.6 1.8 2.0 2.2 2.4 2.6 2.8 3.0
+> seq(1, 5, length.out=4)    # specify length of the vector
+[1] 1.000000 2.333333 3.666667 5.000000
+>x=c(1,3,8,25,100) ; seq(along=x)creates a vector of indices of x, which can be used for looping or accessing subsets of datasets
+
+Coercion is from lower to higher types from logical to integer to double to character. in vector
+
+> switch("color", "color" = "red", "shape" = "square", "length" = 5)
+[1] "red"
+
+Vector index in R starts from 1, unlike most programming languages where index start from 0
+
+We can also use negative integers to return all elements except that those specified.
+
+> x <- c("first"=3, "second"=0, "third"=9)
+> names(x)
+
+We can check if a variable is a matrix or not with the class() function.dimension can be checked directly with the dim() function)
+All attributes of an object can be checked with the attributes() function
+
+x <- matrix(1:9, nrow = 3, dimnames = list(c("X","Y","Z"), c("A","B","C"))) and accessed or changed with two helpful functions colnames() and rownames()
+Elements can be accessed as var[row, column].
+
+A common operation with matrix is to transpose it. This can be done with the function t()
+
+Data frame is a two dimensional data structure in R. It is a special case of a list which has each component of equal length.
+
+Each component form the column and contents of the component form the rows.
+list structure can be examined with the str() function.//str is used to find structure of any object in R and gives couple of its first elements.
+
+By default, data.frame() function converts character vector into factor.To suppress this behavior, we can pass the argument stringsAsFactors=FALSE.
+housing <- data.table::fread("https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Fss06hid.csv") used to read table from url into ram 
+download.file(fileUrl, destfile = paste0(getwd(), '/getdata%2Fdata%2FDATA.gov_NGAP.xlsx'), method = "curl")
+dat <- xlsx::read.xlsx(file = "getdata%2Fdata%2FDATA.gov_NGAP.xlsx", sheetIndex = 1, rowIndex = 18:23, colIndex = 7:15)
+ways to calculate mean on factor in data.table
+****************************************
+sapply(split(DT$pwgtp15,DT$SEX),mean)
+mean(DT$pwgtp15,by=DT$SEX)
+tapply(DT$pwgtp15,DT$SEX,mean)
+DT[,mean(pwgtp15),by=SEX]
+rowMeans(DT)[DT$SEX==1]; rowMeans(DT)[DT$SEX==2]
+mean(DT[DT$SEX==1,]$pwgtp15); mean(DT[DT$SEX==2,]$pwgtp15)
+****************************************
+DT=data.table() is almost similar to data.frame(). tables() to get all the tables in the memory. DT[,list(sum(x),mean(y))] gives v1=0.5 , v2=1.3
+DT[,z=x^2] , adds new column z with value as x square. DT[,m:={temp=(x+z);log2(temp+5)}] ,can use multiple step operations in data tables.
+plyr like operations : DT[,a:=x>0] 
+group values by a and places into a new column b: DT[,b:mean(x+w),by=a]
+DT[ , .N , by=x] : here .N counts values in X after grouping them
+setKey[DT1,x] used to set key to x for DT , setKey[DT2,x] then use merge[DT1,DT2] to create join on both datatables
+
+use copy() function to copy data.tables to avoid changes in original table.
+k={print(5);10} prints 5 and k gives 10
+
+
+Factor is a data structure used for fields that takes only predefined, finite number of values (categorical data). distinct values are called levels.checked using the levels() function.
+
+S3 class is somewhat primitive in nature. It lacks a formal definition and object of this class can be created simply by adding a class attribute to it.
+
+library(help="datasets") //Information on package ‘datasets’
+
+read.csv , read.table, readLines, source, load , dget, unserialized are used for reading data
+fileUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fwksst8110.for"
+SST <- read.fwf(fileUrl, skip=4, widths=c(12, 7, 4, 9, 4, 9, 4, 9, 4))   #is used to read fixed width format files
+
+dget can only be used on a single R object
+write.table , writeLines, dump, dput , save , serialize are used to wrote data.
+dump/source are used to parse and deparse multiple objects 
+
+sapply(dataframename,class) gives us typeof data columns in table/dataframe
+
+barplot(titanic.data, main = "Survival of Each Class", xlab = "Class", col = c("red","green") )
+legend("topleft", c("Not survived","Survived"), fill = c("red","green") )
+Instead of a stacked bar we can have different bars for each element in a column juxtaposed to each other by specifying the parameter beside = TRUE 
+
+complete.cases is used to filer NA in dataframes  ex: good=complete.cases(data.frame) and then to display use data.frame[good,]
+
+seq_along() is used to traverse charactervector in for loop	, seq_len() takes integer input in for loop
+
+next is to skip a loop 
+removNA=TRUE  in function arguments removes na from matrix input 
+mean(x,na.rm=removeNA) calculates mean by removing nas in it 
+loop functions like lapply, sapply, apply , mapply , tapply loook at https://www.r-bloggers.com/apply-lapply-rapply-sapply-functions-in-r/
+
+lapply is to apply a function on all elements of a list or vector returns list. x=list(1,2,3,4,5) ;  r=lapply(x,sqrt)
+sapply is simplified result of lapply which means returns a dataframe. sapply(x,sqrt)
+
+apply is used to convert 3 dimension matrix to 2 dimension (and 2 dim to 1 dim) matrix by applying a function. similar to colMeans,rowmeans. x=matrix(1:10,nrow=2,ncol=5) ; apply(x,1,sum) # 1 is for rowsum and 2 is for colsum
+
+mapply is used to apply multiple times a function over vectors or lists one index at a time., mapply(function(x,y){x^y},x=c(2,3),y=c(3,4))
+tapply is used to apply a function to a category of items. which is uses factor. tapply(mtcars$wt,mtcars$cyl,mean), which calculates mean on mtcars$wt after grouping by mtcars$cyl 
+
+rbinom(1,size=1,prob=0.5) us this to flip a coin output
+
+split() takes a vector or other objects and splits into groups determined by factor or list of factors
+x=c(rnorm(10),ruinf(10),rnorm(10,1))
+f=gl(3,10)   # gl() Generate factors by specifying the pattern of their levels. here it generated 3 levels with each of 10 length
+split(x,f)
+lapply(split(x,f),mean)
+
+s=split(airquality,airquality$Month)
+sapply(s, function(x) colMeans(airquality , na.rm = TRUE))
+
+rep(x,y) is repeats x for y times. ex: x=c(1:10) ; x_length=length(x); y = rep(0,x_length), here y is created with length of x vector and filled with 0's
+
+message/warning/error/condition is produced by message/warning/stop/userdefined condition function
+
+invisible(x) is used to prevent the object x to console but return something from function.
+
+all nan's (not a number) are na's(not assigned) but not vice versa
+
+ruinf uses min and max to generate random uniform numbers, rnorm uses mean and sd to produce random normal variates
+dnorm evaluates normal probability density(with a given mean/sd) at a point(or vector of points)
+pnorm evaluates the cumulative distribution function for a normal distribution
+qnorm uses quantile function 
+rgamma, dgamma, pgamma, qgamma are for gamma distribution and for poisson distribution there are dpois, rpois, ppois, rpois
+rpois generate random poisson variates with a given rate
+
+lm(y~x) is linear modelling function
+
+summary(rnorm(100,2,2)) gives you summary like minimum, mean, median, maximum, 0.25%, 0.75%
+gives summary about the input object
+
+set.seed(1) ensures reproducibility of random numbers
+
+sample(1:10, 4, replace=TRUE) produces 4 random numbers from given vector with replacement 
+
+profiling is way to examine how much time spent on different parts of program
+
+1.systemtime() gives time in seconds to test certain function or code blocks, and are usertime, elapsed time.  
+2.Rprof() function starts the profiler in  R, don't use 1 and 2 at the same time. summaryRprof() summarizes the output from Rprof() which is readable
+we can normalize Rprof() with "by.total" and "by.self"
+
+nchar() is used to count the number of characters in a line. identical(a,b) checks if a and b are identical and returns true or false.
+
+which(X$var1>8) returns index numbers of var1 column of X dataframe whose values are >8
+
+sort(X$var1,na.last=TRUE) is used to sort with default increasing order, use na.last= true to get missing values at the end.
+or you can order a particular column in dataframe using X[order(X$var1),] 
+or order with plyr as below
+library(plyr); arrange(X,var1)
+ 
+table(X$var1,useNA="ifany") , because by default table command will ignore na's
+table(restData$councilDistrict,restData$zipCode)
+any() all() can be used accordingly
+colSums(is.na(restData)) gives a table with nas in each column , if there are no na's then verify with any(colSums(is.na(restData))==0) which gives true
+rowSums() similar to above
+
+table(restData$zipCode %in% c("21212","21213")) gives true count and false count 
+xtabs(col1 ~ col2 + col3 , data=Data.Frame) is a crosstabs used to make table with given columns. col1 is displayed in table with col2 as rowname and col3 as colname
+ftable(xtabs_data) gives a flat table which means a summary of multiple crosstables 
+
+object.size(restData) gives size of data
+
+restData$zipWrong=ifelse(restData$zipCode<0 , TRUE , FALSE) creates new column with true or flase according to the condition
+
+creating categorical variable: restData$zipGroups=cut(restData$zipCode,breaks = quantile(restData$zipCode , c(21231,21232)) ; table(restData$zipGroups,restData$zipCode) 
+easier cutting for categorical variables , to make clusters: library(Hmisc) ; restData$zipGroup = cut2(restData$zipcode , g=4)
+
+creating factor variables : restData$zcf=factor(restData$zipCode) ; levels(restData$zcf) can be used to check levels 
+as.numeric(restData$zcf) to make them into 1,2,3,etc
+
+mutate() is used to create a new data frame with a copy of old data frame and a new column adding to it.
+restData2=mutate(restData,zipGroups=cut2(zipCode,g=4))
+
+other common transforms are abs(x) , sqrt(x) , ceiling(x) , floor(x) , round(3.475,digits=2) is 3.48 , signof(3.475,digits=2) is 3.5 , cos(x) , sin(X) , log(x) , exp(x) , log2(x) , log10(x)
+
+if you want to merge 2 tables based on a column(say id1) from first table and a column(say id2) from second table you can use
+merge(table1, table2 , by.x="id1" , by.y="id2", all=TRUE )    # use this if column names are different in 2 tables.
+join(table1,table2) #use join if column names are same in both the tables.
+join_all(table1,table2,table3...tablen) to join many tables with same column names
+intersect(names(table1),names(tables2))  to get common names in both the tables.
+
+tibble = tbl_df(data.frame)
+
+library(dplyr) which consists mainly 5 functions : select() ,  filter(), arrange() , mutate() , summarize() 
+select(cran,ip_id,package,country) or select(cran,r_arch:country)  or select(cran,-(r_arch:country))  which helps in subsetting columns 
+filter() helps in subsetting rows : filter(cran,package == "swirl") or filter(cran,r_version == "3.1.1" , country == "US") which you can specify as many conditions as you want 
+ 
+jpeg::readJPEG("./data/tutor.jpg",native = TRUE) : reading jpg file without corrupting downloading: download.file(url,destfile = "./data/tutor.jpg" , mode='wb')
+ 
+nrow(mtcars) gives number of rows in the table. and ncol(mtcars) gives number of columns in the table
+
+options(width=150) makes increasing the width of the console 
+
+View(data) is used to see all rows of data in R studio.
+
+to import packages from bioconductor use BiocManager::install("packageName")
+
+spray2 = relevel(InsectSprays$spray, "C") # relevel is used to change the factor level order.
+
+# Find the names of all columns except the predictor.
+  others <- setdiff(names(dataframe), predictor)
+  
+# let's eliminate Girth from the data set. Call the reduced data set trees2 to indicate it has only 2
+trees2 <- eliminate("Girth", trees).
+
+#This package allows a record of your analysis (your R command history) to be documented. 
+devtools::install_github("jhudsl/matahari")
+library(matahari)
+#Before you start the analysis for this assignment, enter the following command to begin the documentation of your analysis:
+dance_start(value = FALSE, contents = FALSE)
+#You can then proceed with the rest of your analysis in R as usual. When you have finished your analysis, use the following command to save the record of your analysis on your desktop:
+dance_save("~/Desktop/college_major_analysis.rds")
+
+LETTERS[1:3] gives A,B,C
+
+
+
+
+
+
+
+

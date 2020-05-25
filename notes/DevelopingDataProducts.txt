@@ -1,0 +1,215 @@
+time limit of shinyapps.io per month
+
+Some people in this session let us know that they are concerned about running up against the 25-hour per month limit on the free tier of shinyapps.io.
+
+Should you hit the limit on the free plan, RStudio will send you a message. If you receive the message and are more than a few days from getting a fresh 25 hours on your monthly renewal, please send an email to shinyapps-support@rstudio.com with the email address you use on the service and the account name you are using (the first part of the URL). RStudio will then increase your limit so you can continue working on your project.
+
+________________________________________________________________________________________________________
+
+library(googleVis)
+suppressPackageStartupMessages(library(googleVis))
+M <- gvisMotionChart(Fruits , "Fruit","Year")
+plot(M)
+print(M)
+
+results="asis" when you include this in markdown
+________________________
+
+G = gvisGeoChart(Exports,locationvar = "Country",colorvar = "Profit",options = list(width=600,height=400))
+plot(G)
+________________________
+require(datasets)
+states <- data.frame(state.name, state.x77)
+GeoStates <- gvisGeoChart(states, "state.name", "Illiteracy",
+                          options=list(region="US", 
+                                       displayMode="regions", 
+                                       resolution="provinces",
+                                       width=600, height=400))
+plot(GeoStates)
+
+
+to merge 2 plots in 1 chart
+a=gvisMerge(G,GeoStates)
+plot(a)
+________________________________________________________________________________
+
+library(plotly)
+plot_ly(mtcars,x=mtcars$wt,y=mtcars$mpg,mode="markers")
+plot_ly(trees,x= trees$Girth,y=trees$Volume,mode="markers", color = as.factor(trees$Height))
+plot_ly(trees,x= trees$Girth,y=trees$Volume,mode="markers", color = trees$Volume)  # for continous variable
+plot_ly(trees,x= trees$Girth,y=trees$Volume,mode="markers", color = as.factor(trees$Height),size= trees$Girth)  # points size depends on Girth
+plot_ly(trees,x= trees$Girth,y=trees$Volume, z= trees$Height , type = "scatter3d", mode="markers")  #3d plot
+________________________________________________________________________________________________________
+
+library(plotly)
+library(tidyr)
+library(dplyr)
+data("EuStockMarkets")
+stocks <- as.data.frame(EuStockMarkets) %>% gather(index,price ) %>% mutate(time = rep(time(EuStockMarkets),4))
+plot_ly(stocks, x= stocks$time, y=stocks$price , color = stocks$index)
+________________________________________________________________________________________________________
+
+plot(stocks$price[stocks$index=="DAX"], type="histogram")
+
+plot_ly(iris, y=iris$Petal.Length, color=iris$Species, type="box")
+
+terrain <- matrix(rnorm(100,100),ncol = 100,nrow = 100)
+plot_ly(z=terrain, type="heatmap")
+
+terrain2 <- matrix(sort(rnorm(100,100)),ncol = 100,nrow = 100)
+plot_ly(z=terrain2, type="surface")
+
+Sys.setenv("plotly_username"="vamshigvk")
+Sys.setenv("plotly_api_key"="J7gghhz6TMbJRcpfr1IF")
+
+api_create(p)  # to publish plot/code to plot.ly
+
+________________________________________________________________________________________________________
+
+my_data <- data.frame(X = rnorm(100), Y = rnorm(100))
+pickXY(my_data)
+state_pop <- data.frame(State=state.abb , Pop=as.vector(state.x77[,1]))
+head(state)
+head(state.abb)
+state_pop$hover <- with(state_pop,paste(State,'<br>',"population:",Pop))
+borders <- list(color=toRGB("red"))
+map_options <- list(scope='usa',projection=list(type='albers usa'),showlakes=TRUE,lakecolor=toRGB('white'))
+plot_ly(state_pop,z=Pop, text=hover,locations= State,type="choropleth",locationmode='USA-states', color=Pop,colors='Blues',marker=list(line=borders))%>%layout(title="US population in 1975", geo=map_options)
+________________________________________________________________________________________________________
+
+R markdown presentation:
+
+## My new slide
+
+above command creates a new slide with title as "My new slide"
+
+***
+above command is used to create new slide without title
+
+### A top level subheading
+above command is for top level subheading
+
+#### A second level subheading
+above command is used for second level subheading
+
+ctrl+ shift +k is used as shortcut for knitting
+ctrl + enter is used to run selected code in RStudio
+
+- bullet one
+- bullet two
+
+1. ordered a
+2. ordered b
+
+plain text
+
+*italic text*
+
+**bold text**
+
+`for(i %in% 1:10)` to display code as it is 
+
+
+```{r ,echo=TRUE,comment=""}   #echo=true shows the code in presentation,comment="" gives nothing before every line of output,eval=FALSE will show code but no output
+head(mtcars)
+```
+
+________________________________________________________________________________________________________
+
+Leaflet:
+
+library(leaflet)
+my_map <- leaflet() %>% addTiles()
+my_map
+
+#generates the map of world, we use piping notation more in leaflet
+
+or 
+
+my_map <- leaflet()
+my_map <- addTiles(my_map)
+my_map <-addMarkers(my_map,lat=17.509118,lng=78.369661,popup = "Vamshi's Home") # used to add marker
+my_map
+
+df <- data.frame(lat = runif(20,min = 39.2,max = 39.3),
+lng = runif(20,min = -76.6,max = -76.5))
+df %>% leaflet() %>% addTiles()%>%addMarkers()
+
+# dataframe df with 20 lat and long , create multiple markers using dataframe
+_______________________________________________________
+
+custom markers and separate popups for each markers:
+
+hopkinsIcon <- makeIcon(
+	iconUrl = "https://i.pinimg.com/originals/d9/4a/49/d94a495eca526d82ebbe0640aea413a9.jpg",
+	iconWidth = 31*215/230 , iconHeight = 31,
+	iconAnchorX = 31*215/230/2,iconAnchorY=16
+)
+
+hopkinsLatLong <- data.frame(
+	lat = c( 39.29978, 39.29924 ,39.23829 ,39.22327 ,39.25965), 
+	lng = c(-76.54485, -76.55024, -76.57076, -76.59571, -76.57859 )
+)
+
+hopkinsSites <- c(
+	"<a href= 'http://www.jhsph.edu/'>East baltimore campus </a>",
+	"<a href= 'http://www.srinidhi.ac.in/'>Srinidhi campus </a>",
+	"<a href= 'http://www.vasavi.ac.in/'>Vasavi campus </a>",
+	"<a href= 'http://www.cbit.ac.in/'>CBIT campus </a>",
+	"<a href= 'http://www.carey.jhu.edu/'>Carey Business school </a>"
+)
+
+hopkinsLatLong %>% leaflet() %>% addTiles() %>% addMarkers(icon = hopkinsIcon , popup = hopkinsSites)
+
+_______________________________________________________
+
+clusters and circles example:
+
+df <- data.frame(lat = runif(500, min = 17.50 , max = 17.60),
+lng = runif(50,min = 78.36 , max = 78.46))
+df %>% leaflet() %>% addTiles() %>% addMarkers(clusterOptions = markerClusterOptions())
+
+df %>% leaflet() %>% addTiles() %>% addCircleMarkers()
+_______________________________________________________
+
+Drawing Circles , Rectangles and legends:
+
+md_cities <- data.frame(names=c("Baltimore","Fredrick","Rockville","Gaithersburg"),
+                        pop=c(6194,3888,6334,6045),
+                        lat= c(39.2920,39.2631,39.4782,39.2642),
+                        lng = c(-76.6077,-76.6245,-76.6235,-76.6576))
+md_cities %>% leaflet() %>% addTiles() %>% addCircles(weight = 1, radius = sqrt(md_cities$pop)*30)
+
+
+leaflet() %>% addTiles() %>% addRectangles(lat1 = 17.508118 , lng1 = 78.369661 , lat2 = 17.509110, lng2 = 78.3690)
+
+df <- data.frame(lat = runif(20,min = 39.2,max = 39.3),
+lng = runif(20,min = -76.6,max = -76.5),
+col = sample(c("red","blue","green"),20,replace=TRUE),stringsAsFactors = FALSE)
+df %>% leaflet() %>% addTiles() %>% addCircleMarkers(color = df$col) %>% addLegend(labels =LETTERS[1:3] ,colors = c("red","blue","green"))
+
+________________________________________________________________________________________________________
+
+to see method definition or sournce of a method or function in r:
+http://rfaqs.com/source-code-of-r-method
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,128 @@
+Topics covered include literate programming tools, evidence-based data analysis, and organizing data analyses
+
+Replication---------> Reproducibility <------------Nothing
+
+Steps in data analysis:
+-Define the question
+-Define the ideal dataset
+-Determine what data you can access
+-Obtain the data
+-Clean the data
+-Exploratory data analysis
+-Statistical Prediction / Modelling
+-Interpret results
+-Challenge results
+-Synthesize / write up results
+-Create reproducible code
+_____________________________________________________________________________________________________________
+
+Data analysis files:
+Data: Raw data, Processed data
+Figures: Exploratory figures, Final figures
+R code: Raw/unused scripts, Final scripts, R markdown files
+Text : ReadMe Files, Text of analysis / report
+_____________________________________________________________________________________________________________
+
+Coding Standards for R
+1.Always use text files/text editors 
+2.Indent your code(Minimum 4 spaces - Ideal 8 spaces)
+3.Limit the width of your code(80 columns)
+4.Limit the length of individual functions
+_____________________________________________________________________________________________________________
+
+Summary : Checklist
+-Are we doing good science?
+-Was any part of this analysis done by hand?
+	-If so, are those parts precisely document?
+	-Does the documentation match reality?
+-Have we taught a computer to do as much as possible(i.e. coded)
+-Are we using a version control system?
+-Have we documented our software environment?
+-Have we saved any output that we cannot reconstruct from original data + code?
+-How far in the analysis pipeline can we go before our results are no longer (automatically) reproducible?
+_____________________________________________________________________________________________________________
+
+Research pipeline:
+
+Author
+------------------>
+
+
+Measured data ----(Processing code)---->Analytic data------(Analytic code)------->Computational results----(Presentation code)---->Figures,Tables,NumericalSumaries---
+
+----->Ariticles<------Text
+						
+			<-------------------
+				Reader
+				
+				
+			
+_____________________________________________________________________________________________________________
+
+
+The Cacher package for R.
+Evaluates code written in files and stores intermediate results in a key-value database.
+R expressions are given SHA-1 hash values so that changes can be tracked and code revaluated if necessary.
+"Cacher packages" can be built for distribution
+others can "clone" an analysis and evaluate subset of code or inspect data objects
+
+Using cacher as an author:
+-The cachepackage function creates a cacher package storing
+--source file
+--cached dataobject
+--Metadata
+
+-Package file is zipped and can be distributed
+-readers can unzip the file and immediately investigate its content by cacherpackage
+
+Using cacher as a reader:
+>library(cacher)
+>clonecache(id="092d")  # creates cache directory ".cache"
+
+>showfiles()
+[1] "top20.R"
+>sourcefile("top20.R")
+
+Cloning an analysis:
+local directories are created
+source code files and metadata are downloaded
+dataobjects are not downloaded by default
+references to dataobjects are loaded and corresponding data can be lazy-loaded on demand
+
+>graphcode() gives you a graph of data objects and methods used
+
+Tracing code backwards:
+>objectcode("data")    #gives source file
+
+Running code:
+-The runcode function executes code in the sourcefile.
+-by default, expressions that result in an object being created are not run and the resulting object is lazy-loaded into the workspace
+-Expressions not resulting in objects are evaluated.
+
+Checking code and objects:
+The checkcode function evaluates all expressions from scratch
+The results of evaluation are checked against stored results to see if results are as the same as author calculated.
+The integrity of the data objects can be verified with the checkobjects function to check for possible corruption of data.
+
+Inspecting data objects:
+>loadcache() #loads specific data objects on to workspace
+>ls() # gives you data objects loaded with loadcache() function
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

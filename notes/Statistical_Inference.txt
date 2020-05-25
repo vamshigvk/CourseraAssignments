@@ -1,0 +1,481 @@
+Probability assigns a number between 0 and 1 to events to give a sense of the "chance" of the event. Probability has become our default model for apparently random phenomena. Our eventual goal is to use probability models, our formal mechanism for connecting our data to a population. However, before we get to probability models, we need to understand the basics of probability calculus.
+
+Probability: given a random experiment (say rolling a die) a probability measure is a population quantity that summarizes the randomness
+	The probability of at least one of two events, A and B, occurring is the sum of their individual probabilities minus the probability of their intersection. 
+	P(A U B) = P(A) + P(B) - P(A n B)
+	
+	It follows that if A and B are disjoint or mutually exclusive, i.e. only one of them can occur,
+	then P(A U B) = P(A)+P(B)
+	
+	if A implies B then P(A) < P(B) 
+
+Random variable : A random variable is a numerical outcome of an experiment, it can be numeric or continous.
+	EX: The (0-1) outcome of the flip of a coin
+		The outcome from the roll of a die
+		The website traffic on a given day
+		IQ for a sample of children
+	
+Probability mass function(for discrete random variables):(pmf) a probability mass function evaluated at a value corresponds to the probability that a random variable takes that value.
+	to be a valid pmf a function, p must satisy
+	1. It must always be larger than or equal to 0
+	2. The sum of possible values that the random variable can take has to add up to one.
+	(p^x)*(1-p)^(1-x)=1
+	
+probability density function(for continous random variables) : is a function that describes the relative likelihood for this random variable to take on a given value. The probability of the random variable falling within a particular range of values is given by ... the area under the density function but above the horizontal axis and between the lowest and greatest values of the range (pdf) 
+	To be a valid pdf a function must satisy :
+		1. It must be larger than or equal to zero everywhere
+		2. The total area under it must be 1
+	
+	Ex: probablity that it is less than or equal to 75% when f(x) = 2x if 0<x<1 and f(x) = 0
+	pbeta(0.75, 2, 1) : gives 0.5625
+	
+Cumulative distribution function(CDF): The CDF of a random variable, X, returns the probability that the random variable is less than or equal to the value x
+	F(x)=P(X<=x)
+	EX: pbeta(X,2,1) , if X=60% or 0.60 then pbeta(0.60,2,1) gives 0.36 (this is x) which is less than X
+
+Survival function: 1-F(x). for above X=60% the answer is 1-0.36=0.64
+
+Quantile: the alphath quantile of a distribution with a distribution function F is the point xalpha so that F(xalpha)=alpha
+
+Conditional probability: Conditional probability is a very intuitive idea, "What is the probability given partial information about what has occurred?". The 		probability of getting hit by lightning is small. However, it's much larger for people playing outside in open fields during a lightning storm! In these lectures we go over the formal rules of conditional probability.
+
+	Let B be an event so that P(B)>0
+	then  P(A|B) = P(A n B)/P(B) ; probability of A given the event of B occured
+	then  P(A&B) = P(A|B) * P(B)
+	then  P(B|A) = P(B&A)/P(A) = P(A|B) * P(B)/P(A)
+	Suppose we don't know P(A) itself, We can then express P(A) = P(A|B) * P(B) + P(A|~B) * P(~B) and substitute this is into the denominator of Bayes' Formula
+	and P(D|+) / P(~D|+) = P(+|D) * P(D) / (P(+|~D) * P(~D)) = P(+|D)/P(+|~D) * P(D)/P(~D)
+
+Baye's rule: named after presbyterian minister Thomas Bayes 
+	P(B|A) = P(A|B)P(B) / P(A|B)P(B) + P(A|Bc)P(Bc) 
+	
+Independence:
+	Event A is independent of event B if P(A|B)= P(A) where P(B)>0
+										or P(A n B) = P(A)*P(B)
+										
+iid random variables: Random variables are said to be iid if they are independent and identically distributed
+	independent: statistically unrelated from one and another
+	identically distributed: all having been drawn from the same population distribution
+	
+	Random variables which are iid are the default model for random samples and many of the important theories of statistics assume that variables are iid. We'll usually assume our samples are random and variables are iid.
+	
+Expected values: The empirical average is a very intuitive idea; it's the middle of our data in a sense. But, what is it estimating? We can formally define the middle of a population distribution. This is the expected value. Expected values are very useful for characterizing populations and usually represent the first thing that we're interested in estimating.
+	 
+	 The expected value of a random variable X, E(X), is a measure of its central tendency. For a discrete random variable X with PMF p(x), E(X) is defined as a sum, over all possible values x, of the quantity x*p(x). E(X) represents the center of mass of a collection of locations and weights, {x, p(x)}.
+	 
+	 Another term for expected value is mean. Recall your high school definition of arithmetic mean (or average) as the sum of a bunch of numbers divided by the number of numbers you added together. This is consistent with the formal definition of E(X) if all the numbers are equally weighted.
+
+	One of the nice properties of the expected value operation is that it's linear. This means that, if c is a constant, then E(cX) = c*E(X). Also, if X and Y are two random variables then E(X+Y)=E(X)+E(Y). It follows that E(aX+bY)=aE(X)+bE(Y).
+	
+	
+
+	1. Expected values are properties of distribution
+	2. The population mean is center of mass of population
+	3. The sample mean is the center of mass of the observed data
+	4. The sample mean is an estimate of the population mean
+	5. The sample mean is unbiased
+		-The population mean of its distributed is the mean that its trying to estimate
+	The more data that goes into the sample mean, the more concentrated its density/mass function is around the population mean.
+____________________________________________________________________________________________________
+
+A statistic (singular) is a number computed from a sample of data. We use statistics to infer information about a population. Second, a random variable is an outcome from an experiment. Deterministic processes, such as computing means or variances, applied to random variables, produce additional random variables which have their own distributions. It's important to keep straight which distributions you're talking about.
+
+There are two broad flavors of inference. The first is frequency, which uses "long run proportion of times an event occurs in independent, identically distributed repetitions." The second is Bayesian in which the probability estimate for a hypothesis is updated as additional evidence is acquired. Both flavors require an understanding of probability so that's what the next lessons will cover.
+
+____________________________________________________________________________________________________
+
+Variability:
+	An important characterization of a population is how spread out it is. One of the key measures of spread is variability. We measure population variability with the sample variance, or more often we consider the square root of both, called the standard deviation. The reason for taking the standard deviation is because that measure has the same units as the population. So if our population is a length measurement in meters, the standard deviation is in meters (whereas the variance is in meters squared).
+
+	Variability has many important uses in statistics. First, the population variance is itself an intrinsically interesting quantity that we want to estimate. Secondly, variability in our estimates is what makes them not imprecise. An important aspect of statistics is quantifying the variability in our estimates.
+
+	Var(X)=E[(X-u)^2]=E[x^2]-E[X]^2
+	squareroot of the variance is called standard deviation
+	
+	EXample:
+		E[X]=3.5 for a fair die
+		E[X^2]=1^2*1/6 + 2^2*1/6 + 3^2*1/6 + 4^2*1/6 + 5^2*1/6 + 6^2*1/6 = 15.17
+	
+		therefore Var(X)=E[X^2]-E[X]^2  =~ 2.92 
+	Example:
+		Whats the variance from the result of a toss of a coin with the probability of heads(1) of p?
+		E[x] = 0*(1-p) + 1*p=p
+		E[X^2]= 0^2(1-p) + 1^2 * p = p
+		E[X]^2 = p*p=p^2
+		
+		therefore Var(X)= E[X^2]-E[X]^2 = p-p^2 = p*(1-p)
+		
+	Sample variance:
+		so just like the polulation mean and the sample mean were directly analogous, the population variance and the sample variance are directly analogous. 
+		so for example the population mean was the center of mass of the population and the sample mean was the center of mass of the observed data.
+		
+		The population variance is the expected square of distance of a random variable from the polulation around the population mean. 
+		The sample variance is the average square of distance of the observed observations minus the sample mean. and divide with (n-1)
+		
+		we use n-1 because, variance is a good estimate of the population variance, that as we collect more data, the distribution of sample variance gets more concentrated about what its trying to estimate and that its centered in the right place in another words that its unbiased. this unbiaseness is why we divide n-1 instead of n. 
+		
+		It has an associate population distribution. Its expected value is the population variance.
+		
+		if the population is infinite, the variance of the sample
+		| mean is the population variance divided by the sample size. Specifically,
+		| Var(X') = sigma^2 / n. 
+		Var(X')=Var(1/n*Sum(X_i))=(1/n^2)*Var(Sum(X_i))=(1/n^2)*Sum(sigma^2)=sigma^2/n
+
+
+____________________________________________________________________________________________________
+
+standard error of the mean:
+	we call the standard deviation of a statistic a standard error.
+		 Variance of sample mean: Var(X bar) = (sigma square)/n
+		 Standard error of the mean is Sigma/sqrt(n)
+		 if Sigma = S then it is S/sqrt(n)
+		 
+		 S, the standard deviation talks about how variable the population is
+		 S/sqrt(n) , the standard error, talks about how variable averages of random samples of size n from the population area
+		 
+	Simulation examples:
+		nosim=1000
+		n=10
+			
+	sd(apply(matrix(rnorm(nosim*n),nosim),1,mean))  or standard normals have variance 1 ,mean=0, means of n standard normals have standard deviation 1/sqrt(n)
+	sd(apply(matrix(runif(nosim*n),nosim),1,mean)) 							 or 1/sqrt(12*n)
+	sd(apply(matrix(rpois(nosim*n,4),nosim),1,mean)) 						 or 2/sqrt(n)
+	sd(apply(matrix(sample(0:1,nosim*n, replace=TRUE),nosim),1,mean))        or 1/2*sqrt(n)
+
+rnorm(10); gives  [1] -1.4331340  1.9840426  0.3984448 -2.0086702  1.7399516 -0.4762009  -0.2499362  1.4642595  2.1377774 -0.2234090
+runif(10); gives [1] 0.31559516 0.35802120 0.00413667 0.63377023 0.71774064 0.21504916 0.88229165 0.75128647 0.19038671 0.60548703
+rpois(10,10); gives [1]  6 11  6 11  8  7 19 10  5 12
+sample(0:1,10,replace=TRUE) gives  [1] 0 0 0 1 1 0 0 0 0 1
+
+standard error of a fair coin is 1/(2*sqrt(n))
+and standard error of a biased coin is (sampleproportion)-p/sqrt(p*(1-p)/n)
+
+	The standard deviation of a statistic is called its standard error, so the standard error of the sample mean is the square root of its variance.
+____________________________________________________________________________________________________
+
+Summarizing the variance:
+	sample variance estimates the population variance
+	The distribution of the sample variance is centered at what its estimating
+	It gets more concentrated around the population variance with larger sample sizes
+	Variance of the sample mean is the population variance divided by n i.e., Var(X bar) = (sigma square)/n
+	standard error is sigma/sqrt(n)
+	
+Data Example:
+	library(UsingR); data(father.son);
+	x=father.son$sheight
+	n=length(x)
+	y=father.son$fheight
+	
+> round(c(var(y),var(y)/n, sd(y), sd(y)/sqrt(n)),2)
+[1] 7.53 0.01 2.74 0.08
+> round(c(var(x),var(x)/n , sd(x), sd(x)/sqrt(n)),2)
+[1] 7.92 0.01 2.81 0.09
+
+____________________________________________________________________________________________________
+
+Distributions:
+	Some probability distributions are so important that we need to internalize their characteristics. In these lectures we cover the most important probability distributions.
+	
+Bernoulli distribution:
+	named after Jacob Bernoulli, it arises as the result of a binary outcome
+	Bernoulli random variables takes (only) the values 1 and 0 with probabilities (say) p and 1-p respectively.
+	
+	Bernoulli probability mass function is:
+		P(X=x)=(P^x)*(1-p)^(1-x)
+
+	** mean of a bernoulli random variable is p and variance is p(1-p)
+	
+	let x be a bernoulli random variable then we typically call x=1 as a success and 0 as failure.
+	
+____________________________________________________________________________________________________
+
+Binomial distribution:
+
+	A binomial random variable is obtained as the sum of a bunch of iid Bernoulli random variables.
+	A binomial random variable is the total number of heads , on the flips of the potentially biased coin.
+	
+	In specific lets X1,....Xn be iid Bernoulli(p);
+	then X = sum(i=1,n)Xi is a binomial random variable P(X=x)= nCx * p^x * (1-p)^(n-x)
+	nC0 and nCn = 1
+	
+	Example: If a person has 8 children out of which 7 are girls. If each gender has an independent 50% probability for each birth.what is the probability of getting 7 or more girls out of 8 births.
+		choose(8,7)*0.5^7*(1-0.5)^(8-7) + choose(8,8)*0.5^8*(1-0.5)^(8-8) = 0.03515625
+		or 
+		> pbinom(6,size=8, prob=0.5, lower.tail = FALSE)
+		[1] 0.03515625
+____________________________________________________________________________________________________
+
+Normal distribution:
+	first best distributions
+	** difference between standard normal and non-standard normal distribution is, for standard its mean is 0 , standard deviation and variance is 1.
+	
+	Approximately 68%, 95%, 99% of the normal density lies within 1,2 and 3 standard deviation from the mean respectively.
+	-1.28, ,-1.645, -1.96 and -2.33 are the 10th, 5th, 2.5th and 1st percentiles of the standard normal distribution respectively.
+	by symmetry 1.28, 1.645, 1.96 and 2.33 are the 90th, 95th, 97.5th and 99th percentiles of the standard normal distribution respectively
+	
+	what is the 95th percentile of a N(mu,sigma^2) distribution?
+	and for non standard normal distribution the 10th percentile is mu+1.645*sigma and similar for other percentiles
+	or you can use qnorm(percentile, mean, sd)
+	
+	ex: pnorm(1160, mean=1020,sd=50, lower.tail=FALSE) gives probability of getting more than 1160 clicks in a day
+		or (1160-1020)/50=2.8
+			which means 1160 is 2.8times farther than standard deviation then pnorm(2.8, lower.tail=FALSE)
+	
+		what number is 75%? then qnorm(0.75, mean=1020,sd=50) gives 1054		
+____________________________________________________________________________________________________
+	
+Poisson distribution:
+	second best distributions. is used to model counts
+	P(X=x;lambda) = (lambda^x)*(e^-lambda)/x! where x is defined on non negative integers 1,2...
+	mean and variance of this distribution is lambda 
+	
+	some uses of poisson distribution:
+		1. Modeling count data
+		2. Modeling event-time or survival data
+		3. Modeling contingency tables
+		4. Approximating binomials when n is large and p is small
+		
+	Poisson random variables are used to model rates:
+		X~Poisson(lambda*t) where
+			lambda = E[X/t] is the expected count per unit of time
+			t is the total monitoring time
+		Example: The number of people that show up at a bus stop is poisson with mean 2.5 per hour.
+			If watching the bus stop for 4hours , what is the probability that 3 or fewer people show up for the whole time?
+			ppois(3, lambda = 2.5*4)   #[1] 0.01033605
+			
+	Poisson approximation to the binomial:
+		when n is large and p is small the poisson distribution is an accurate approximation to the binomial distribution 
+			Notation: X~Binomial(n,p)
+					lambda=n*p
+					n gets large
+					p gets small
+		Example: we flip a coin with the success probability 0.01 five hundred times.
+				what is the probability of 2 or fewer successes?
+				pbinom(2,size=500,prob=0.01) #[1] 0.1233858
+				ppois(2, lambda=500*0.01) #[1] 0.124652
+				
+____________________________________________________________________________________________________
+
+Asymptotics:
+	Asymptotics are an important topics in statistics. Asymptotics refers to the behavior of estimators as the sample size goes to infinity. Our very notion of probability depends on the idea of asymptotics. For example, many people define probability as the proportion of times an event would occur in infinite repetitions. That is, the probability of a head on a coin is 50% because we believe that if we were to flip it infinitely many times, we would get exactly 50% heads.
+	
+	>n=1000
+	> means1=cumsum(sample(0:1,n, replace = TRUE))/(1:n)
+	> plot(means1)
+	> abline(h=0.5)
+	#as the frequency increases it is showing exactly 0.5
+	
+	> means=cumsum(rnorm(n))/(1:n)
+	> plot(means)
+	> abline(h=0)
+
+	Asymptotics is the term for the behavior of statistics as the sample size (or some other relevant quantity) limits to infinity(or some other relevant number).
+	Asymptotics are incredibly useful for simple statistical inference and approximations
+	Asymptotics form the basis for frequency interpretation of probabilities
+	
+	An estimator is consistent if it converges to what you want to estimate
+	The law of Large Numbers(LLN) says that the sample mean of iid samples is consistent for the population mean.
+	The sample variance and the sample standard deviation of iid random variables are consistent as well.
+	What tells us that averages of iid samples converge to the population means that they are estimating? : LLN
+____________________________________________________________________________________________________
+
+Central Limit Theorem(CLT):
+	CLT states that the distribution of averages of iid variables becomes that of a standard normal as the size increases.The shape has to be bell curve.
+	CLT gives no guarantee that n is large enough.
+	
+	CLT = (Estimate-Mean of Estimate)/(Std. err of Estimate)  = (Xbar - mu)/sigma/sqrt(n) = sqrt(n)*(Xbar-mu)/sigma
+	
+	Galton's Quincunx machine illustrates CLT.
+
+56% of votes is not enough , need to do more campaigning in order to win in elections. It should be more than 65% as below 
+> binom.test(56,100)$conf.int
+[1] 0.4571875 0.6591640
+or
+> 0.56+c(1,-1)*qnorm(0.975)*sqrt(0.56*(1-0.56)/100)
+[1] 0.6572901 0.4627099
+
+Taking the mean and adding and subracting the relevant normal quantile times the SE yields a confidence interval(95%) for the mean. 
+
+What tells us that averages are approximately normal for large enough sample sizes? : CLT
+____________________________________________________________________________________________________
+
+Confidence Intervals:
+
+	When we estimate something using statistics, usually that estimate comes with uncertainty. Take, for example, election polling. When we get a polled percentage of voters that favor a candidate, we were only able to sample a small subset of voters. Therefore, our estimate has uncertainty associated with it.
+
+	Confidence intervals are a convenient way to communicate that uncertainty in estimates.
+
+	T Distribution was invented by William Gosset
+____________________________________________________________________________________________________
+
+Hypothesis testing:
+	Deciding between two hypotheses is a core activity in scientific discovery. Statistical hypothesis testing is the formal inferential framework around choosing between hypotheses.
+		
+	Hypothesis testing is concerned with making decisions with data, A null Hypothesis is specified that represents the status quo, usually labelled H0.
+	The null Hypothesis is assumed true and statistic evidence is required to reject it in favor of a research of alternative hypothesis.
+		
+	H0 is null Hypothesis
+	Ha is alternative Hypothesis. are typically of the form <,>or != H0.
+
+	Note that there are 4 possible outcomes of our statistical decision process.
+	Truth	Decide	Result
+	H0		H0		Correctly accept null
+	H0		Ha		Type 1 error,  probability of type1 error is called alhpa
+	Ha		Ha		Correctly reject null
+	Ha		H0		Type 2 error, probability of type2 error is called beta
+	
+	power=1-beta
+	Type1 error rate must be small for a good Hypothesis.As the type 1 error rate increases the type2 error rate decreases and vice versa.
+	
+T-test:	qt(percentile,df)
+			df is degrees of freedom which is n-1. where n is the size.
+	Test statistic = (Xbar-H0)/Std. error = (Xbar-H0)/sd/sqrt(n) = sqrt(n)*(Xbar-H0)/sd
+	where Xbar is Ha.
+	
+	If test statistic is less than T-test then we fail to reject the H0.
+	
+Two sided tests:
+	We want the probability of rejecting under the null to be 5%, split equally as 2.5% in the upper tail and 2.5% in lower tail.
+	Thus we reject if our test statistic is larger than qt(0.975,df) or smaller than qt(0.25,df).
+	This is the same as saying: reject if the absolute value of our statistic is larger than qt(0.975,df)
+	so we fail to reject the 2 sided test as well
+	If you fail to reject the one sided test, you know that you will fail to reject the two sided.
+	
+	Example:
+		library(UsingR); data(father.son)
+		t.test(father.son$sheight-father.son$fheight)
+	One Sample t-test
+
+	data:  father.son$sheight - father.son$fheight
+	t = 11.789, df = 1077, p-value < 2.2e-16
+	alternative hypothesis: true mean is not equal to 0
+	95 percent confidence interval:
+	0.8310296 1.1629160
+	sample estimates:
+	mean of x 
+	0.9969728 
+	
+	t.test(father.son$sheight-father.son$fheight)$conf.int gives confidence interval
+	
+	# t test confidence interval calculation formula
+	σ_p <- sqrt(((n_x - 1) * σ_x^2 + (n_y - 1) * σ_y^2)/(n_x + n_y - 2))
+	confidenceInterval <-  μ_y - μ_x + c(-1, 1) * qt(quantile, df=n_y+n_x-2) * σ_p * (1 / n_x + 1 / n_y)^.5
+	
+	# z test confidence intercal calculation formula
+	σ_p <- sqrt(((n_x - 1) * σ_x^2 + (n_y - 1) * σ_y^2)/(n_x + n_y - 2))
+	confidenceInterval <-  μ_x - μ_y + c(-1, 1) * qnorm(quantile) * σ_p * (1 / n_x + 1 / n_y)^.5
+	
+____________________________________________________________________________________________________
+
+P-values:
+		P-values are a convenient way to communicate the results of a hypothesis test. When communicating a P-value, the reader can perform the test at whatever Type I error rate that they would like. Just compare the P-value to the desired Type I error rate and if the P-value is smaller, reject the null hypothesis.
+
+		1. Create a null hypothesis
+		2. Calculate a test statistic from the data
+		3. Compare the test statistic to a Z or t quantile
+		Your comparison tells you how "extreme" the test value is toward the alternative hypothesis. The p-value is the probability under the null hypothesis of obtaining evidence as or more extreme than your test statistic (obtained from your observed data) in the direction of the alternative hypothesis. 
+		
+		Formally, the P-value is the probability of getting data as or more extreme than the observed data in favor of the alternative. The probability calculation is done assuming that the null is true. In other words if we get a very large T statistic the P-value answers the question "How likely would it be to get a statistic this large or larger if the null was actually true?". If the answer to that question is "very unlikely", in other words the P-value is very small, then it sheds doubt on the null being true, since you actually observed a statistic that extreme
+	
+		If the P-value is small, then either H0 is true and we have observed a rare event or H0 is false.
+		
+		Suppose that you get a T statistic of 2.5 for 15 df testing H0: mu=mu0 versus Ha: mu > mu0.
+		whats the probability of getting a T statistic as large as 2.5
+		pt(2.5,15,lower.tail=FALSE) #0.01225
+		
+		If the P-value is less than alpha you reject the null hypothesis.
+		For two sided hypothesis test, double the smaller of the two one sided hypothesis test P-Values
+	
+		Another way to think about a p-value is as an attained significance level. This is a fancy way of saying that the p-value is the smallest value of alpha at which you will reject the null hypothesis.
+	
+		use pnorm(2) to get 0.977 quantile 
+		
+		
+____________________________________________________________________________________________________
+
+Power:	
+	We've talked about a Type I error, rejecting the null hypothesis when it's true. We've structured our hypothesis test so that the probability of this happening is small. The other kind of error we could make is to fail to reject when the alternative is true (Type II error). Or we might think about the probability of rejecting the null when it is false. This is called Power = 1 - Type II error. We don't have as much control over this probability, since we've spent all of our flexibility guaranteeing that the Type I error rate is small.
+
+	One avenue for the control of power is at the design phase. There, assuming our finances let us, we can pick a large enough sample size so that we'd be likely to 	reject if the alternative is true. Thus the most frequent use of power is to help us design studies.
+	
+	1. Power goes up as alpha gets larger
+	2. Power of a one sided test is greater than the power of the associated 2 sided test. as alpha gets divided in 2 sided test
+	3. Power goes up as mu_a gets further away from mu_0
+	4. Power goes up as n goes up as sample mean has less variability
+	5. Power goes up as sigma goes down, due to our sample mean will have less variability
+	
+	instead Power only depends on (mu_a - mu_0)/standart_error.      where standart_error = sigma/sqrt(n)
+	
+	the quantity (mu_a - mu_0)/sigma is called effect size. and it is unit free. as being free it has some interpretable cross problems.
+	
+	power.t.test()
+	
+	> power.t.test(n=16, delta = 2,sd=4, type = "one.sample", alternative = "one.sided")$power
+	[1] 0.6040329
+	
+	>power.t.test(power=0.8, delta = 2/4,sd=1, type = "one.sample", alternative = "one.sided")$n
+	[1] 26.13751=27
+	
+	> power.t.test(power=0.8, n=27,sd=1, type = "one.sample", alternative = "one.sided")$delta
+	[1] 0.4914855
+	
+____________________________________________________________________________________________________
+
+Resampling: [Bootstrapping]
+	Resampling based procedures are ways to perform population based statistical inferences, while living within our data. Data Scientists tend to really like resampling based inferences, since they are very data centric procedures, they scale well to large studies and they often make very few assumptions.
+	
+	> library(UsingR)
+	> data("father.son")
+	> x=father.son$sheight
+	> n=length(x)
+	> B=10000
+	> resamples=matrix(sample(x,n*B,replace = TRUE),B,n)
+	> resampledMedians=apply(resamples, 1, median)
+	> plot(density(resampledMedians))
+	> quantile(resampledMedians,c(0.025,0.975))
+    2.5%    97.5% 
+	68.43733 68.81461
+	
+	what this density estimate is, is an estimate of distribution of medians where we don't know the actual population distribution we are estimating from our observed data.
+	This is central quantity used in bootstrapping,in this case we are bootstrapping the median.
+	
+	Bootstrap Principle:
+		Suppose that I have a statistic that estimates some population parameter, but I don't know its sampling distribution. The bootstrap principle suggests using the distribution defined by the data to approximate its sampling distribution.
+		
+		-Bootstrap is non-parametric
+		-Better percentile bootstrap confidence intervals correct for bias.
+		
+	Variations on permutation testing
+		1. rank sum test uses rank as data type
+		2. Fisher's exact test uses binary as data type
+		3. Ordinary permutation test uses Raw data as data type
+		
+____________________________________________________________________________________________________
+
+ A variance inflation factor (VIF) is a ratio of estimated variances, the variance due to including the ith
+| regressor, divided by that due to including a corresponding ideal regressor which is uncorrelated with the
+| others. VIF's can be calculated directly, but the car package provides a convenient method for the purpose as we
+| will illustrate using the Swiss data from the datasets package.
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		

@@ -1,0 +1,470 @@
+Supervised learning as the name indicates the presence of a supervisor as a teacher. Basically supervised learning is a learning in which we teach or train the machine using data which is well labeled that means some data is already tagged with the correct answer. After that, the machine is provided with a new set of examples(data) so that supervised learning algorithm analyses the training data(set of training examples) and produces a correct outcome from labeled data.
+
+For instance, suppose you are given a basket filled with different kinds of fruits. Now the first step is to train the machine with all different fruits one by one 
+
+If shape of object is rounded and depression at top having color Red then it will be labelled as –Apple.
+If shape of object is long curving cylinder having color Green-Yellow then it will be labelled as –Banana.
+Now suppose after training the data, you have given a new separate fruit say Banana from basket and asked to identify it.
+
+Since the machine has already learned the things from previous data and this time have to use it wisely. It will first classify the fruit with its shape and color and would confirm the fruit name as BANANA and put it in Banana category. Thus the machine learns the things from training data(basket containing fruits) and then apply the knowledge to test data(new fruit).
+
+Supervised learning classified into two categories of algorithms:
+
+Classification: A classification problem is when the output variable is a category, such as “Red” or “blue” or “disease” and “no disease”.
+Regression: A regression problem is when the output variable is a real value, such as “dollars” or “weight”.
+
+Unsupervised learning
+
+Unsupervised learning is the training of machine using information that is neither classified nor labeled and allowing the algorithm to act on that information without guidance. Here the task of machine is to group unsorted information according to similarities, patterns and differences without any prior training of data.
+
+Unlike supervised learning, no teacher is provided that means no training will be given to the machine. Therefore machine is restricted to find the hidden structure in unlabeled data by our-self.
+For instance, suppose it is given an image having both dogs and cats which have not seen ever.
+
+
+Thus the machine has no idea about the features of dogs and cat so we can’t categorize it in dogs and cats. But it can categorize them according to their similarities, patterns, and differences i.e., we can easily categorize the above picture into two parts. First first may contain all pics having dogs in it and second part may contain all pics having cats in it. Here you didn’t learn anything before, means no training data or examples.
+
+Unsupervised learning classified into two categories of algorithms:
+
+Clustering: A clustering problem is where you want to discover the inherent groupings in the data, such as grouping customers by purchasing behavior.
+Association: An association rule learning problem is where you want to discover rules that describe large portions of your data, such as people that buy X also tend to buy Y.
+______________________________________________________________________________________
+
+prediction:
+	components of a predictor:
+		question->input data -> features -> algorithm -> parameters -> evaluation
+
+______________________________________________________________________________________
+
+In Sample vs Out of Sample error:
+	
+	In Sample error: The error rate you get on the sample dataset you used to build/train your predictor, also called as resubstitution error.
+	Out of Sample error: The error rate you get on a new dataset, also sometimes called generalization error.
+	
+	key ideas:
+		1. Out of sample error is what you care about.
+		2. In sample error < Out sample error
+		3. The reason is overfitting.
+		
+	Overfitting: We want to build models that are simple and robust enough that they don't actually capture the noise, while they do capture all of the signal.
+	
+	** If you are building prediction models, you always have to hold one dataset, and leave it completely aside while building your models.
+	
+Rules of thumb for prediction study design:
+	1. if you have large sample size, 60% training + 20% test + 20% validation
+	2. if you have medium sample size, 60% training + 40% test 
+	3. if you have a small sample size, Do cross validation + Report caveat of small sample size.
+	
+Basic terms:
+		positive : identified, Negative : rejected
+		
+	True positive : correctly identified
+	False positive: incorrectly identified
+	True negative: correctly rejected
+	False negative: incorrectly rejected
+
+Medical testing example:
+	True positive: Sick people correctly diagnosed as sick
+	False positive: Healthy people incorrectly identified as sick
+	True negative: Healthy people correctly diagnosed as healthy
+	False negative: Sick people incorrectly identified as healthy
+	
+	sensitivity: pr(positive test | disease)
+	specificity: pr(negative test| no disease)
+	
+common error measure:
+	1. mean squared error
+	2. median absolute deviation
+	3. sensitivity
+	4. specificity
+	5. accuracy
+	6. concordance
+	
+Receiver operating characteristic curves:
+	is used to measure the quality or goodness of the prediction algorithm.
+	the higher the area the better the predictor is.
+	x-axis : 1-specificity , y-axis: sensitivity
+	
+	Area under the curve(AUC)
+		1. if AUC=0.5 : random guessing
+		2. if AUC=1	  : perfect classifier
+		3. In general AUC above 0.8 considered "good"
+	
+______________________________________________________________________________________
+
+Caret package:
+	
+Data splitting Example:
+
+	library(caret)
+	library(e1071)
+	
+	inTrain <- createDataPartition(y=spam$type, p=0.75, list = FALSE)
+	training <- spam[inTrain,]
+	testing <- spam[-inTrain,]
+	dim(training)
+	dim(testing)
+	dim(spam)
+	
+	set.seed(32343)
+	modelFit <- train(type ~ . , data = training , method = "glm")
+	predictions <- predict(modelFit, newdata = testing)
+	modelFit
+	modelFit$finalModel
+	predictions
+	confusionMatrix(predictions, testing$type)
+	
+Data slicing Example:
+	
+	folds <- createTimeSlices(y=spam$type, initialWindow = 20 , horizon = 10)
+	folds <- createResample(y=spam$type, times = 10, list = TRUE )
+	folds <- createFolds(y=spam$type, k=10, list = TRUE, returnTrain = TRUE)
+
+factor or qualitative variables and turning into quantitative variables:
+	dummies <- dummyVars(wage ~ jobclass,data=training)
+	head(predict(dummies,newdata=training))
+	
+Removing zero covariates:
+	nsv <- nearZeroVar(training,saveMetrics = TRUE)
+	
+	
+calculate RMSE on train dataset and test dataset:
+		sqrt(sum((lm1$fitted - trainFaith$eruptions)^2))
+		sqrt(sum((predict(lm1,newdata= testFaith)-testFaith$eruptions)^2))
+	
+	or 
+
+	>accuracy(pred_svm, testing$CompressiveStrength)
+                ME     RMSE      MAE       MPE     MAPE
+Test set 0.3113479 7.962075 5.515605 -6.845664 20.31935
+______________________________________________________________________________________
+
+library(caret)
+library(AppliedPredictiveModeling)
+set.seed(3433)
+data(AlzheimerDisease)
+adData = data.frame(diagnosis,predictors)
+inTrain = createDataPartition(adData$diagnosis, p = 3/4)[[1]]
+training = adData[ inTrain,]
+testing = adData[-inTrain,]
+
+# grep all columns with IL and diagnosis in the traning and testing set
+trainingIL <- training[,grep("^IL|diagnosis", names(training))]
+testingIL <- testing[,grep("^IL|diagnosis", names(testing))]
+
+# non-PCA
+model <- train(diagnosis ~ ., data = trainingIL, method = "glm")
+predict_model <- predict(model, newdata= testingIL)
+matrix_model <- confusionMatrix(predict_model, testingIL$diagnosis)
+matrix_model$overall[1]
+##  Accuracy 
+## 0.6463415
+# PCA
+modelPCA <- train(diagnosis ~., data = trainingIL, method = "glm", preProcess = "pca",trControl=trainControl(preProcOptions=list(thresh=0.8)))
+matrix_modelPCA <- confusionMatrix(testingIL$diagnosis, predict(modelPCA, testingIL))
+matrix_modelPCA$overall[1]
+
+______________________________________________________________________________________
+
+library(caret)
+library(AppliedPredictiveModeling)
+set.seed(3433)
+data(AlzheimerDisease)
+adData = data.frame(diagnosis,predictors)
+inTrain = createDataPartition(adData$diagnosis, p = 3/4)[[1]]
+training = adData[ inTrain,]
+testing = adData[-inTrain,]
+
+trainingIL <- training[,grep("^IL", names(training))]
+procTrain <- preProcess(trainingIL, method = "pca", thresh = 0.9 )
+procTrain
+
+______________________________________________________________________________________
+
+Regression - decision trees : rpart - recursive partitioning and Regression trees:
+
+library(caret)
+library(ggplot2)
+data("iris")
+names(iris)
+table(iris$Species)
+
+inTrain = createDataPartition(y=iris$Species , p=0.7 , list = FALSE)
+training <- iris[inTrain,]
+testing <- iris[-inTrain,]
+dim(training)
+dim(testing)
+
+qplot(Petal.Width , Sepal.Width , colour = Species, data= training)
+modFit <- train(Species ~ . , method = "rpart" , data = training)
+modFit$finalModel
+plot(modFit$finalModel , uniform = TRUE , main = "Classification Tree")
+text(modFit$finalModel , use.n =  TRUE , all = TRUE , cex = 0.8)
+
+library(rattle)
+fancyRpartPlot(modFit$finalModel)
+predict(modFit,newdata = testing)
+	
+	
+______________________________________________________________________________________
+
+Bagging : Bootstrap aggregating
+
+1. resample cases and recalculate predictions
+2. Average and majority vote
+
+we will get similar bias with reduced variance, which is more useful in non-linear functions
+
+library(ElemStatLearn)
+data("ozone")
+ozone <- ozone[order(ozone$ozone),]
+head(ozone)
+dim(ozone)
+
+ll <- matrix(NA , nrow = 20, ncol = 155)
+for(i in 1:10) {}
+for(i in 1:10) {
+ss <- sample(1:dim(ozone)[1] , replace = T)
+ozone0 <- ozone[ss,] ; ozone0 <- ozone[order(ozone$ozone),]
+loess0 <- loess(temperature ~ ozone , data = ozone0 , span = 0.2)
+ll[i,] <- predict(loess0 , newdata = data.frame(ozone=1:155))
+}
+
+plot(ozone$ozone , ozone$temperature , pch = 19 , cex = 0.5)
+for(i in 1:10){lines(1:155 , ll[i,], col="grey" , lwd=2)}
+lines(1:155, apply(ll,2,mean),col="red" , lwd=2)
+
+if you are using train function  you can use "trainbag" , "bagEarth", "bagFDA" as method options to  perform bagging.
+
+______________________________________________________________________________________
+
+Random forests:
+
+1. Bootstrap samples
+2. At each split, bootstrap variables
+3. Grow multiple trees and vote
+
+Pros: accuracy
+Cons: low speed , difficult to interpret , lead to little bit of overfitting - so use cross validation while using random forests
+
+library(randomForests)
+library(caret)
+library(ggplot2)
+data("iris")
+inTrain <- createDataPartition(y=iris$Species , p=0.7 , list = FALSE )
+training <- iris[inTrain,]
+testing <- iris[-inTrain,]
+
+modFit <- train(Species ~ . , data=training , method = "rf" , prox = TRUE)
+print(modFit)
+getTree(modFit$finalModel,k=2)
+pred <- predict(modFit , testing) ; testing$predRight <- pred == testing$Species
+table(pred,testing$Species)
+plot(modFit)
+qplot(Petal.Width , Petal.Length , colour = predRight , data= testing ,main = "Newdata predictions")
+
+variable importance can be known with varImp(modFit)
+
+Model error of Random forest model by number of trees
+plot(modFit$finalModel,main="Model error of Random forest model by number of trees")
+
+______________________________________________________________________________________
+
+Boosting:
+
+1. Take lots of (possibly ) weak predictors
+2. Weight them and add them up
+3. Get a stronger predicor
+
+Most famous boosting algorithm is probably Adaboost.
+
+gbm - does boosting with trees
+mboost - model based boosting
+ada - additive logistic regression
+gamBoost - boosting generalized additive models
+
+library(ISLR)
+library(ggplot2)
+library(caret)
+data(Wage)
+Wage <- subset(Wage, select = -c(logwage))
+inTrain <- createDataPartition(y=Wage$wage , p=0.7 , list = FALSE)
+training <- Wage[inTrain,]
+testing <- Wage[-inTrain,]
+
+modFit <- train(wage ~ . ,data = training, method = "gbm" ,verbose= FALSE) #verbose= FALSE will omit the iteration output
+print(modFit)
+qplot(predict(modFit,testing), wage , data=testing)
+
+______________________________________________________________________________________
+
+Model based prediction: using linear(lda) / quadrant discriminant analysis , naive bayes
+
+1. Assume the data follow a probabilistic model
+2. Use Baye's theorem to identify optimal classifiers
+
+library(caret)
+data("iris")
+library(ggplot2)
+names(iris)
+table(iris$Species)
+inTrain <- createDataPartition(y=iris$Species , p=0.7 , list = FALSE )
+training <- iris[inTrain,]
+testing <- iris[-inTrain,]
+dim(training)
+dim(testing)
+
+modlda <- train(Species ~ . ,data = training , method = "lda")
+modnb <- train(Species ~ . , data= training ,method = "nb")
+
+plda= predict(modlda,testing)
+pnb=predict(modnb,testing)
+
+equalPredictions = (plda==pnb)
+table(plda,pnb)
+qplot(Petal.Width,Sepal.Width,color=equalPredictions,data=testing)
+
+______________________________________________________________________________________
+
+regularized linear model:
+
+1. fit a regression model
+2. Penalize(shrink) ;arge coefficients
+
+pros: bias variance(high variance = highly corelated) tradeoff , can help with model selection
+cons: may be computationally demanding on large datasets , does not perform as well as randomForests and boosting
+
+penalty is used in this which helps reduce complexity , reduce variance,and respects structure of the problem.
+
+tuning parameter lambda controls the size of coefficients, controls the amount of regularization, as lambda -> 0 we obtain least square solution
+and as lambda -> infinity , it penalizes the coefficients a lot and all of the coefficients go toward zero.
+
+lasso shrinks all of the coefficients and some of them to 0
+
+in caret we can set method = "lasso" , "ridge" or "relaxo" to fit different kinds of penalized regression models.
+
+EXample:
+library(elasticnet)
+fit3 <- train(CompressiveStrength ~. , data=training , method="lasso")
+plot.enet(fit3$finalModel , xvar = "penalty" ,use.color = TRUE )
+______________________________________________________________________________________
+
+ensembling methods: combining predictors
+
+1. you can combine classifiers by averaging/voting    ex: combine boosting classifier with a randomForest with a linear regression model
+2. combining classifiers increases accuracy
+3. combining classifiers reduces interpretability
+4. boosting, bagging, randomForests are variants in this theme
+
+______________________________________________________________________________________
+
+Forecasting: for time-series problems
+
+library(quantmod)
+from.dat = as.Date("01/01/08",format="%m%d%y")
+to.dat <- as.Date("12/31/13",format = "%m%d%y")
+getSymbols("GOOG",src="google",from=from.datm to=to.dat)  or GOOG <- getSymbols("GOOG", auto.assign=FALSE, verbose=TRUE)
+head(GOOG)
+
+mGoog <- to.monthly(GOOG)
+googOpen <- Op(mGoog)
+ts1 <- ts(googOpen , frequency = 12)
+plot(ts1,xlab="Years+1" ,ylab="GOOG")
+
+plot(decompose(ts1) , xlab="Years+1")
+
+training and test sets:
+	ts1Train <- window(ts1,start =1 , end=5)
+	ts1Test <- window(ts1,start=5,end=(7-0.01))
+	ts1Train
+
+Simple moving average:
+	library(forecast)
+	plot(ts1Train)
+	lines(ma(ts1Train,order=3),col="red")
+
+Exponential smoothing:
+	ets1 <- ets(ts1Train,model="MMM")
+	fcast <- forecast(ets1)
+	plot(fcast);lines(ts1Test,col="red")
+	
+Get the accuracy:
+	accuracy(fcast,ts1Test)
+	
+______________________________________________________________________________________
+
+unsupervised prediction:
+
+1. create clusters
+2. name clusters
+3. Build predicor for clusters
+
+In a new dataset , predict the clusters
+
+Example:
+
+data(iris)
+library(ggplot2)
+library(caret)
+inTrain <- createDataPartition(y=iris$Species , p=0.7,list=FALSE)
+training <- iris[inTrain,]
+testing <- iris[-inTrain,]
+dim(training)
+dim(testing)
+
+Cluster with k-means:
+
+	kmeans1 <- kmeans(subset(training, select = -c(Species)),centers=3)
+	training$clusters <- as.factor(kmeans1$cluster)
+	qplot(Petal.Width, Petal.Length,colour=clusters ,data=training)
+
+compare to real labels:
+	
+	table(kmeans1$cluster , training$Species)
+	
+Build predictor:
+		
+	modFit <- train(clusters ~ . , data=subset(training , select = -c(Species)),method = "rpart")
+	table(predict(modFit,training),training$Species)
+	
+Apply on test:
+	
+	testClusterPred <- predict(modFit , testing)
+	table(testClusterPred , testing$Species)
+
+library(clue)
+cl_predict() in clue package provides similar functionality
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
