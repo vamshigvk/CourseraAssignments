@@ -1,0 +1,131 @@
+---
+title: "Regression Models Course Project"
+author: "Vamshi Krishna"
+date: "7/12/2020"
+output: pdf_document
+---
+
+## Executive Summary
+  Motor Trend, a magazine about the automobile industry. Below is the data analysis which can answer a question with suitable data.
+  1. "Is an automatic or manual transmission better for MPG"
+  2. "Quantify the MPG difference between automatic and manual transmissions"
+
+  The below analysis tells us the answers are:
+  1. The automatic or manual transmission when compared to MPG for the dataset are not statistically significant.
+  2. The MPG difference is 1.8 for automatic vs manual transmissions.
+  
+## Loading and preprocessing data
+
+Lets load the data and print the head of the datarame and get an idea of columns and data within the dataframe.
+
+```{r load}
+data(mtcars)
+head(mtcars)
+```
+
+We can see that the rownames are the model names and other variables/features are in columns
+
+Lets see the variables types and size of the data
+```{r}
+print(str(mtcars))
+print(dim(mtcars))
+```
+
+It is good that all the variables are in number type with 32 rows and 11 columns
+
+## Data cleaning and EDA
+
+By converting some of the variables to factors from numbers, it will be helpful for analysis.
+```{r}
+columns = c('cyl','vs','am','gear','carb')
+mtcars[,columns] <- lapply(mtcars[,columns] , factor)
+str(mtcars)
+```
+
+Lets see the relation of linear regression between automatic/manual transmissions vs MPG.
+the initial assumptions of the model are appropriate mean value and error should be distributed in normal and independent.
+
+```{r}
+fit1 = lm(mpg~am,mtcars)
+summary(fit1)
+#figure1 from appendix
+```
+
+lets now look at confidence interval using the formula we know
+```{r}
+beta_hat = 0.7245
+standard_error = 1.764
+t_star = qt(1-0.05/2,df = length(mtcars$mpg)-2)
+c(beta_hat-t_star*standard_error, beta_hat+t_star*standard_error)
+```
+
+From both the plots in figure1, the results of our coefficient summary, small p-value and presence of 0 in CI, we reject the null hypothesis that transmissions affects MPG.
+
+## Multivariate Analysis
+
+Lets now include new variables to increase the standard errors of coefficient estimates of other coorelated regressors.
+
+Lets now create a fit for all the other variables with MPG
+
+```{r}
+fit2 = lm(mpg~. , mtcars)
+```
+
+Now, we determine which variables are important fot the correlation using stepAIC function.
+
+```{r}
+library('MASS')
+step = stepAIC(fit2, direction="both", trace=FALSE)
+summary(step)
+```
+
+The significant variables from the summary in relation to the MPG are cylinders(cyl),horsepower(hp),weight(wt).
+
+## Comparing the models:
+
+To conclude that the secoind model using step is better than the first model, we use ANOVA to compare the models.
+
+```{r}
+anova(fit1,step)
+```
+
+The difference in both models is the significant. Lets plot the best fit model to view it clearly.(see figure2 from appendix)
+
+## Finding significance of transmission type vs mpg
+Lets summarize the coeffients of the best model:
+
+```{r}
+coefficients(summary(step))
+```
+
+Looking at the p-values in summary data, we can see that the p-value from transmissions vs MPG is not significant. We can prove this using confidence interval as we did above.
+
+```{r}
+beta_hat1 = 1.8092
+standard_error1 = 1.3963
+t_star1 = qt(1-0.05/2, df = length(mtcars$mpg)-2)
+c(beta_hat1-t_star1*standard_error1,beta_hat1+t_star1*standard_error1)
+```
+
+Since the CI includes 0 and the p-value is .0.5, the difference between automatic transmission and a manual trnasmission does not affect the MPG significantly. However auto-trnasmission is 1.8 greater than the manual.
+
+## Conclusion
+By reviewing the above models, the best fit from figure2 shows that the normal Q-Q graph is normally distributed and the scale-location graph has a steady variance which is good when compared to figure1. and finally we can conclude that am does not have a significant impact on mpg.
+
+## Appendix
+
+### Figure 1:
+
+```{r}
+par(mfrow=c(2,2))
+plot(fit1)
+abline(fit1)
+```
+
+### Figure 2:
+```{r}
+par(mfrow=c(2,2))
+plot(step)
+abline(step)
+```
+
