@@ -1,0 +1,187 @@
+---
+title: "Practical Machine Learning Week4"
+author: "Vamshi Krishna"
+date: "7/14/2020"
+output: html_document
+---
+
+## Introduction
+
+One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, our goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants.
+
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset).
+
+The goal of our project is to predict the manner in which they did the exercise. This is the "classe" variable in the training set. You may use any of the other variables to predict with.
+
+## Source of Data
+
+The training data for this project are available here:
+
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv
+
+The test data are available here:
+
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv
+
+## Loading the dataset and libraries required
+
+The data for this project come from this source: http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har.
+
+Lets load the required libraries for this project and read training and testing data from the urls above and see the shape and structure of the data we are dealing with.
+Lets also see the head of the training data to get the idea of what data is present in it.
+
+```{r}
+library(caret)
+library(rpart)
+library(rpart.plot)
+library(RColorBrewer)
+library(RGtk2)
+library(rattle)
+library(randomForest)
+library(gbm)
+library(e1071)
+
+training = read.csv('https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv')
+testing = read.csv('https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv')
+dim(training)
+dim(testing)
+head(training)
+str(training)
+```
+
+## Data cleaning
+
+Lets clean the raw data using several methods
+
+### Removing variables having nearly zero variance
+
+Lets remove the variables which are near to the value of zero, as they wont me useful much using nearZeroVar
+
+```{r}
+near_zero_var = nearZeroVar(training)
+
+near_zero_training = training[,-near_zero_var]
+near_zero_testing = testing[,-near_zero_var]
+dim(near_zero_training)
+dim(near_zero_testing)
+```
+
+### Removing variables having NAs
+
+Lets also remove the variables which are NAs
+
+```{r}
+na_var <- sapply(near_zero_training, function(x) mean(is.na(x))) > 0.95
+
+na_training <- near_zero_training[,na_var == FALSE]
+na_testing <- near_zero_testing[,na_var==FALSE]
+
+dim(na_training)
+dim(na_testing)
+
+```
+
+### Removing non-numeric variables
+
+Lets remove first 7 rows as those contains non-numeric data in them
+
+```{r}
+non_num_training <- na_training[,8:59]
+non_num_testing <- na_testing[,8:59]
+
+dim(non_num_training)
+dim(non_num_testing)
+```
+
+The final data after cleaning the raw data we get are non_num_training and non_num_testing and see their dimensions
+
+## Creating Data Partitioning
+
+Now, lets partition the data using createDataPartition method with 60% as training data and 40% as testing data and store them in train and test dataframes and see their size
+
+```{r}
+inTrain <- createDataPartition(non_num_training$classe, p=0.6, list=FALSE)
+train <- non_num_training[inTrain,]
+test <- non_num_training[-inTrain,]
+
+dim(train)
+dim(test)
+```
+
+Lets check if classe column is present in training dataset and problem_id in testing dataset (raw data)
+
+```{r}
+'classe' %in% names(training)
+'problem_id' %in% names(testing)
+```
+
+## Fitting model using Decision Tree
+
+Lets first fit the model using decision tree on our data and predict the values of test data and create a confusion matrix and finally plot a decision tree using rpart.plot
+
+```{r}
+DTree_fit <- train(classe ~ ., data = train, method="rpart")
+DTree_pred <- predict(DTree_fit, test)
+confusionMatrix(DTree_pred, test$classe)
+rpart.plot(DTree_fit$finalModel, roundint=FALSE)
+```
+
+## Fitting model using Gradient Boosting
+
+Lets now secondly fit a model using gradient boosting method and predict with training data and plot the accuracy of this model
+
+```{r}
+GBM_fit <- train(classe ~ ., data = train, method = "gbm", verbose = FALSE)
+GBM_fit$finalModel
+```
+
+```{r}
+GBM_pred <- predict(GBM_fit, test)
+
+GBM_pred_conf <- confusionMatrix(GBM_pred, test$classe)
+GBM_pred_conf
+```
+
+```{r}
+plot(GBM_pred_conf$table, col = GBM_pred_conf$byClass,
+main = paste("Gradient Boosting - Accuracy Level =",
+round(GBM_pred_conf$overall['Accuracy'], 4)))
+```
+
+## Fitting model using Random Forest
+
+Lastly fit a model using Random FOrest method and predict with training data and plot the accuracy of this model using confusion matrix
+
+```{r}
+RF_fit <- train(classe ~ ., data = train, method = "rf", ntree = 50)
+RF_pred <- predict(RF_fit, test)
+RF_pred_conf <- confusionMatrix(RF_pred, test$classe)
+RF_pred_conf
+```
+
+```{r}
+plot(RF_pred_conf$table, col = RF_pred_conf$byClass,
+main = paste("Random Forest Accuracy : ",
+round(RF_pred_conf$overall['Accuracy'], 4)))
+```
+
+## Conclusion and Summary
+As decision tree model's accuracy was very low, we completely ignore that model and concentrate on the other two models' accuracy.
+```{r}
+RF_pred_conf$overall
+GBM_pred_conf$overall
+```
+After looking at the overall statistics data of both the models, the random Forest model has more accuracy than the GBM model. So, we are selecting Random Forest model for final prediction of testing data.
+
+## Final modelling and prediction on actual Test data
+
+```{r}
+training_data = non_num_training
+testing_data = non_num_testing
+
+RF_final_fit <- train(classe ~ ., data = training_data, method = "rf", ntree = 50)
+
+final_pred <- predict(RF_final_fit, testing_data)
+final_pred
+```
+
